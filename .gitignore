@@ -1,0 +1,16 @@
+.vs/*
+*/.vs/*
+.vscode/*
+!.vscode/*.json
+*/.vscode/*
+!*/.vscode/*.json
+
+!*.lib
+build/
+bin/
+obj/
+[Mm]akefile
+!MakeProject/[Mm]akefile
+*.sln
+*.vcxproj
+*.vcxproj.*
