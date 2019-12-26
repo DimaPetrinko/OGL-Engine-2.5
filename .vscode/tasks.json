@@ -1,0 +1,69 @@
+{
+	"tasks": [
+		{
+			"label": "build Debug win64",
+			"type": "shell",
+			"command": "& 'G:/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe' -p:Configuration=\"Debug\" -p:Platform=Win64",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "build Release win64",
+			"type": "shell",
+			"command": "& 'G:/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe' -p:Configuration=\"Release\" -p:Platform=Win64",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "build Debug linux64",
+			"type": "shell",
+			"command": "make config=debug_linux64",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "build Release linux64",
+			"type": "shell",
+			"command": "make config=release_linux64",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "rebuild premake (windows)",
+			"type": "shell",
+			"command": ".BuildTools/premake5.exe vs2019",
+			"problemMatcher": []
+		},
+		{
+			"label": "rebuild premake (linux)",
+			"type": "shell",
+			"command": "premake5 gmake2",
+			"problemMatcher": []
+		},
+		{
+			"label": "clean project (linux)",
+			"type": "shell",
+			"command": "make clean",
+			"problemMatcher": []
+		},
+		{
+			"label": "clean project (windows)",
+			"type": "shell",
+			"command": "& 'G:/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe' -t:clean -p:Platform=Win64",
+			"problemMatcher": []
+		}
+	],
+	"version": "2.0.0"
+}

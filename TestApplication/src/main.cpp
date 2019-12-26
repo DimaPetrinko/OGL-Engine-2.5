@@ -17,6 +17,10 @@
 #endif
 
 const int EXITCODE_RUN = -1;
+const int EXITCODE_EXIT = 0;
+const int EXITCODE_ERROR = 1;
+
+const int GL_INVALID_ID = 0;
 
 class Quad
 {
@@ -79,8 +83,8 @@ public:
 			if ((_exitCode = UpdateLogic()) != EXITCODE_RUN) break;
 			if ((_exitCode = UpdateScreen()) != EXITCODE_RUN) break;
 		}
-		std::cout<<_exitCode<<std::endl;
 		Deinit();
+		std::cout<< "Exited with code " << _exitCode<<std::endl;
 		return _exitCode;
 	}
 protected:
@@ -119,13 +123,13 @@ public:
 protected:
 	int Init() override
 	{
-		if (!CreateWindow("OGL-Engine-2.5", _windowWidth, _windowHeight)) return 1;
+		if (!CreateWindow("OGL-Engine-2.5", _windowWidth, _windowHeight)) return EXITCODE_ERROR;
 
 		auto error = glewInit();
 		if (error != GLEW_OK)
 		{
 			std::cout << glewGetErrorString(error) << std::endl;
-			return 1;
+			return EXITCODE_ERROR;
 		}
 		printf("GL version: %s\n", glGetString(GL_VERSION));
 
@@ -165,23 +169,19 @@ protected:
 	int UpdateLogic() override
 	{
 		// printf("UpdateLogic\n");
+		if (_quad.position.x > _windowWidth) _direction.x = -_step.x;
+		else if (_quad.position.x < 0) _direction.x = _step.x;
+		if (_quad.position.y > _windowHeight) _direction.y = -_step.y;
+		else if (_quad.position.y < 0) _direction.y = _step.y;
+
+		_quad.Move(_direction);
 		return EXITCODE_RUN;
 	}
 
 	int UpdateScreen() override
 	{
 		// printf("UpdateScreen\n");
-		if (glfwWindowShouldClose(_window)) return 0;
-
-		const auto w = (float)_windowWidth;
-		const auto h = (float)_windowHeight;
-
-		if (_quad.position.x > w) _direction.x = -_step.x;
-		else if (_quad.position.x < 0) _direction.x = _step.x;
-		if (_quad.position.y > h) _direction.y = -_step.y;
-		else if (_quad.position.y < 0) _direction.y = _step.y;
-
-		_quad.Move(_direction);
+		if (glfwWindowShouldClose(_window)) return EXITCODE_EXIT;
 
 		static float* positions = _quad.GetPositions();
 		static unsigned int* indices = _quad.GetIndices();
@@ -194,10 +194,10 @@ protected:
 
 		float mvpMatrix[16] =
 		{
-			2/w,0,	0,	-1,
-			0,	2/h,0,	-1,
-			0,	0,	1,	0,
-			0,	0,	0,	 1,
+			2.0f/_windowWidth, 0, 0, -1,
+			0, 2.0f/_windowHeight, 0, -1,
+			0, 0, 1, 0,
+			0, 0, 0, 1,
 		};
 		GLCall(glUniformMatrix4fv(_mvpUniformLocation, 1, GL_TRUE, mvpMatrix));
 
@@ -292,7 +292,7 @@ private:
 			GLCall(glGetShaderInfoLog(id, length, &length, message));
 			printf("Failed to compile shader! %s\n", message);
 			GLCall(glDeleteShader(id));
-			return 0;
+			return GL_INVALID_ID;
 		}
 
 		return id;

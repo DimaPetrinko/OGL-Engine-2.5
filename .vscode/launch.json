@@ -1,0 +1,56 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug (Windows)",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/Debug/TestApplication/bin/TestApplication.exe",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": true,
+			"preLaunchTask": "build Debug win64"
+		},
+		{
+			"name": "Release (Windows)",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/Release/TestApplication/bin/TestApplication.exe",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": true,
+			"preLaunchTask": "build Release win64"
+		},
+		{
+			"name": "Debug (Linux)",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/Debug/TestApplication/bin/TestApplication",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": true,
+			"preLaunchTask": "build Debug linux64"
+		},
+		{
+			"name": "Release (Linux)",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/Release/TestApplication/bin/TestApplication",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": true,
+			"preLaunchTask": "build Release linux64"
+		}
+	]
+}
