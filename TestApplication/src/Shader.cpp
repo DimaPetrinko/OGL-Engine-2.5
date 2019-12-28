@@ -4,17 +4,15 @@
 #include <sstream>
 #include "Renderer.h"
 
-Shader::Shader(const std::string& filePath) : _filePath(filePath) {}
+Shader::Shader(const std::string& filePath)
+{
+	auto[vertexShaderSource, fragmentShaderSource] = ParseShader(filePath);
+	_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
+}
 
 Shader::~Shader()
 {
 	GLCall(glDeleteProgram(_rendererId));
-}
-
-void Shader::Generate()
-{
-	auto[vertexShaderSource, fragmentShaderSource] = ParseShader(_filePath);
-	_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
 }
 
 void Shader::Bind() const

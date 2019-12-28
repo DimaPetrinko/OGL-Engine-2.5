@@ -8,13 +8,12 @@
 class Shader : public GraphicsObject
 {
 private:
-	std::string _filePath;
+	// std::string _filePath;
 	std::unordered_map<std::string, int> _uniformLocations;
 
 public:
 	Shader(const std::string& filePath);
 	~Shader();
-	void Generate() override;
 	void Bind() const override;
 	void Unbind() const override;
 

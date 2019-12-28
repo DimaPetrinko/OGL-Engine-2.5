@@ -97,10 +97,10 @@ private:
 	int _windowHeight = 320;
 
 	Quad _quad;
-	VertexBuffer _vb{};
-	IndexBuffer _ib{};
-	VertexArray _va{};
-	Shader _basicShader;
+	VertexBuffer* _vb{};
+	IndexBuffer* _ib{};
+	VertexArray* _va{};
+	Shader* _basicShader;
 	Vector2 _step;
 	Vector2 _direction;
 
@@ -109,7 +109,6 @@ public:
 						  Vector2(50.0f, -50.0f),
 						  Vector2(50.0f, 50.0f),
 						  Vector2(-50.0f, 50.0f))),
-				_basicShader(Shader(WORKING_DIRECTORY "res/shaders/Basic.shader")),
 				_step(Vector2(20.f, 5.f)),
 				_direction(Vector2(_step.x, _step.y)){}
 
@@ -126,22 +125,18 @@ protected:
 		}
 		printf("GL version: %s\n", glGetString(GL_VERSION));
 
-		_ib.Generate();
-		_vb.Generate();
-		_va.Generate();
+		_vb = new VertexBuffer();
+		_va = new VertexArray();
+		_ib = new IndexBuffer();
+		_basicShader = new Shader(WORKING_DIRECTORY "res/shaders/Basic.shader");
 
-		_va.Bind();
 		VertexBufferLayout layout;
 		layout.Push<float>(2);
-		_va.AddBuffer(_vb, layout);
-		_va.Unbind();
+		_va->AddBuffer(_vb, layout);
 
-		_ib.Bind();
-		_ib.SetData(_quad.GetIndices(), 6);
-		_ib.Unbind();
+		_ib->SetData(_quad.GetIndices(), 6);
 
-		_basicShader.Generate();
-		_basicShader.Unbind();
+		_basicShader->Unbind();
 
 		// glVertexAttribPointer(attribute index, elements count, GL_FLOAT, normalize (for 0 .. 255 byte or smth),
 		// size of vertex in bytes (includes texture coords), starting index (in bytes));
@@ -187,20 +182,18 @@ protected:
 
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
-		_vb.Bind();
-		_vb.SetData(positions, 8 * sizeof(float));
-		_vb.Unbind();
+		_vb->SetData(positions, 8 * sizeof(float));
 
-		_basicShader.Bind();
-		_basicShader.SetUniform4f("u_color", positionNormalized.x, 10.0f, positionNormalized.y, 1.0f);
-		_basicShader.SetUniformMatrix4fv("u_mvp", mvpMatrix);
+		_basicShader->Bind();
+		_basicShader->SetUniform4f("u_color", positionNormalized.x, 10.0f, positionNormalized.y, 1.0f);
+		_basicShader->SetUniformMatrix4fv("u_mvp", mvpMatrix);
 
-		_va.Bind();
-		_ib.Bind();
+		_va->Bind();
+		_ib->Bind();
 		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-		_va.Unbind();
-		_ib.Unbind();
-		_basicShader.Unbind();
+		_ib->Unbind();
+		_va->Unbind();
+		_basicShader->Unbind();
 
 		glfwPollEvents();
 		glfwSwapBuffers(_window);
@@ -209,8 +202,13 @@ protected:
 
 	void Deinit() override
 	{
-		printf("Deinit\n");
+		delete(_vb);
+		delete(_ib);
+		delete(_va);
+		delete(_basicShader);
 		glfwDestroyWindow(_window);
+
+		printf("Deinit\n");
 	}
 
 private:

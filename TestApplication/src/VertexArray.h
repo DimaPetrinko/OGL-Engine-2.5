@@ -32,18 +32,18 @@ public:
 	template<typename T>
 	void Push(const unsigned int& count) {}
 
-	const std::vector<VertexBufferElement>& GetElements() const { return elements; }
-	unsigned int GetStride() const { return stride; }
+	inline const std::vector<VertexBufferElement>& GetElements() const { return elements; }
+	inline unsigned int GetStride() const { return stride; }
 };
 
 
 class VertexArray : public GraphicsObject
 {
 public:
+	VertexArray();
 	~VertexArray();
 
-	void Generate() override;
 	void Bind() const override;
 	void Unbind() const override;
-	void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
+	void AddBuffer(const VertexBuffer* vb, const VertexBufferLayout& layout);
 };
