@@ -1,10 +1,10 @@
 #include <iostream>
 #include "Math.h"
-#include "Renderer.h"
-#include "IndexBuffer.h"
-#include "VertexBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
+#include "Rendering/Renderer.h"
+#include "Rendering/IndexBuffer.h"
+#include "Rendering/VertexBuffer.h"
+#include "Rendering/VertexArray.h"
+#include "Rendering/Shader.h"
 
 #ifdef PLATFORM_WIN64
 #define WORKING_DIRECTORY ""
@@ -97,10 +97,11 @@ private:
 	int _windowHeight = 320;
 
 	Quad _quad;
-	VertexBuffer* _vb{};
-	IndexBuffer* _ib{};
-	VertexArray* _va{};
-	Shader* _basicShader;
+	Rendering::Renderer* _renderer;
+	Rendering::VertexBuffer* _vb;
+	Rendering::IndexBuffer* _ib;
+	Rendering::VertexArray* _va;
+	Rendering::Shader* _basicShader;
 	Vector2 _step;
 	Vector2 _direction;
 
@@ -125,21 +126,19 @@ protected:
 		}
 		printf("GL version: %s\n", glGetString(GL_VERSION));
 
-		_vb = new VertexBuffer();
-		_va = new VertexArray();
-		_ib = new IndexBuffer();
-		_basicShader = new Shader(WORKING_DIRECTORY "res/shaders/Basic.shader");
+		_renderer = new Rendering::Renderer();
+		_vb = new Rendering::VertexBuffer();
+		_va = new Rendering::VertexArray();
+		_ib = new Rendering::IndexBuffer();
+		_basicShader = new Rendering::Shader(WORKING_DIRECTORY "res/shaders/Basic.shader");
 
-		VertexBufferLayout layout;
+		Rendering::VertexBufferLayout layout;
 		layout.Push<float>(2);
 		_va->AddBuffer(_vb, layout);
 
 		_ib->SetData(_quad.GetIndices(), 6);
 
 		_basicShader->Unbind();
-
-		// glVertexAttribPointer(attribute index, elements count, GL_FLOAT, normalize (for 0 .. 255 byte or smth),
-		// size of vertex in bytes (includes texture coords), starting index (in bytes));
 
 		return EXITCODE_RUN;
 	}
@@ -180,20 +179,14 @@ protected:
 			0, 0, 0, 1,
 		};
 
-		GLCall(glClear(GL_COLOR_BUFFER_BIT));
-
 		_vb->SetData(positions, 8 * sizeof(float));
 
 		_basicShader->Bind();
 		_basicShader->SetUniform4f("u_color", positionNormalized.x, 10.0f, positionNormalized.y, 1.0f);
 		_basicShader->SetUniformMatrix4fv("u_mvp", mvpMatrix);
 
-		_va->Bind();
-		_ib->Bind();
-		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-		_ib->Unbind();
-		_va->Unbind();
-		_basicShader->Unbind();
+		_renderer->Clear();
+		_renderer->Draw(_ib, _va, _basicShader);
 
 		glfwPollEvents();
 		glfwSwapBuffers(_window);
@@ -206,6 +199,7 @@ protected:
 		delete(_ib);
 		delete(_va);
 		delete(_basicShader);
+		delete(_renderer);
 		glfwDestroyWindow(_window);
 
 		printf("Deinit\n");

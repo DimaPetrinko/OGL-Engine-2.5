@@ -23,7 +23,7 @@
 		{
 			"label": "build Debug linux64",
 			"type": "shell",
-			"command": "make config=debug_linux64",
+			"command": "premake5 gmake2 && make config=debug_linux64",
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -33,7 +33,7 @@
 		{
 			"label": "build Release linux64",
 			"type": "shell",
-			"command": "make config=release_linux64",
+			"command": "premake5 gmake2 && make config=release_linux64",
 			"group": {
 				"kind": "build",
 				"isDefault": true
