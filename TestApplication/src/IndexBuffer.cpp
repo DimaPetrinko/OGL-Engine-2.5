@@ -3,7 +3,7 @@
 
 IndexBuffer::~IndexBuffer()
 {
-	GLCall(glDeleteBuffers(1, &rendererId));
+	GLCall(glDeleteBuffers(1, &_rendererId));
 }
 
 void IndexBuffer::SetData(const unsigned int* data, const unsigned int count)
@@ -15,12 +15,12 @@ void IndexBuffer::SetData(const unsigned int* data, const unsigned int count)
 
 void IndexBuffer::Generate()
 {
-	GLCall(glGenBuffers(1, &rendererId));
+	GLCall(glGenBuffers(1, &_rendererId));
 }
 
 void IndexBuffer::Bind() const
 {
-	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererId));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _rendererId));
 }
 
 void IndexBuffer::Unbind() const

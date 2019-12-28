@@ -1,6 +1,8 @@
 #pragma once
 #include "GL/glew.h"
+#include "GLFW/glfw3.h"
 
+#define GL_INVALID_ID 0;
 #define GLCall(x) GLClearError();\
 	x;\
 	GLLogCall(#x, __FILE__, __LINE__)

@@ -3,7 +3,7 @@
 class GraphicsObject
 {
 protected:
-	unsigned int rendererId{};
+	unsigned int _rendererId{};
 public:
 	virtual ~GraphicsObject() = default;
 	virtual void Generate() = 0;
