@@ -195,11 +195,11 @@ protected:
 
 	void Deinit() override
 	{
-		delete(_vb);
-		delete(_ib);
-		delete(_va);
-		delete(_basicShader);
-		delete(_renderer);
+		delete _vb;
+		delete _ib;
+		delete _va;
+		delete _basicShader;
+		delete _renderer;
 		glfwDestroyWindow(_window);
 
 		printf("Deinit\n");
@@ -235,12 +235,31 @@ private:
 	}
 };
 
+#include "AssetManagement/AssetDatabase.h"
+#include "AssetManagement/ShaderAsset.h"
+
 int main()
 {
-	App* app = new TestApp();
+	Resources::Asset* shaderAsset = Resources::AssetDatabase
+	::GetAsset<Resources::ShaderAsset>(WORKING_DIRECTORY "res/shaders/Basic.shader");
+	// std::cout << *((std::string*)(assetPointer->GetData())) << std::endl;
+	// std::cout << *((std::string*)(assetPointer2->GetData())) << std::endl;
+	char* shaderData = (char*)shaderAsset->GetData();
+	std::cout << shaderData << std::endl;
+	Resources::AssetDatabase::PutBack(shaderAsset);
 
-	int exitCode = app->Run();
+	Resources::AssetDatabase::UnloadUnusedAssets();
+	Resources::AssetDatabase::UnloadAllAssets();
 
-	delete(app);
-	return exitCode;
+	std::cout << shaderData << std::endl;
+
+	// std::cout << *((std::string*)(assetPointer2->GetData())) << std::endl;
+
+
+	// App* app = new TestApp();
+
+	// int exitCode = app->Run();
+
+	// delete(app);
+	// return exitCode;
 }

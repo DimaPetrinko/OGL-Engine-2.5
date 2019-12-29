@@ -52,6 +52,14 @@ namespace Rendering
 		std::ifstream stream(filePath);
 		if (stream.fail()) printf("%s doesn't exist\n", filePath);
 
+		// stream.seekg(0, std::ios::end);
+		// auto size = stream.tellg();
+		// char* s = new char[size];
+		// stream.seekg(0, std::ios::beg);
+		// stream.read(s, size);
+		// // stream >> s;
+		// std::cout << s;
+
 		enum class ShaderType
 		{
 			None = -1, Vertex = 0, Fragment = 1
@@ -69,6 +77,7 @@ namespace Rendering
 			}
 			else ss[(int)type] << line << "\n";
 		}
+		stream.close();
 		return { ss[0].str(), ss[1].str() };
 	}
 
