@@ -1,4 +1,5 @@
-#include "Math.h"
+#include "Maths.h"
+#include <cmath>
 
 Vector2::Vector2() : Vector2(0,0) {}
 

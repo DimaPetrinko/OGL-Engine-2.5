@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cmath>
-
 const float PI = 3.14159265359f;
 const float RAD_TO_DEG = 57.2957795131f;
 const float DEG_TO_RAD = 0.01745329251f;

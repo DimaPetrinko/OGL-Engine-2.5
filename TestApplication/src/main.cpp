@@ -1,5 +1,8 @@
 #include <iostream>
-#include "Math.h"
+#include "Maths.h"
+#include "AssetManagement/AssetDatabase.h"
+#include "AssetManagement/ShaderAsset.h"
+#include "Rendering/Rendering.h"
 #include "Rendering/Renderer.h"
 #include "Rendering/IndexBuffer.h"
 #include "Rendering/VertexBuffer.h"
@@ -62,10 +65,11 @@ private:
 class App
 {
 protected:
-	GLFWwindow* _window;
+	GLFWwindow* _window = nullptr;
 private:
-	int _exitCode;
+	int _exitCode {};
 public:
+	virtual ~App() = default;
 	int Run()
 	{
 		_exitCode = Init();
@@ -89,7 +93,7 @@ protected:
 	virtual void Deinit() = 0;
 };
 
-class TestApp : public App
+class TestApp final : public App
 {
 private:
 
@@ -130,7 +134,10 @@ protected:
 		_vb = new Rendering::VertexBuffer();
 		_va = new Rendering::VertexArray();
 		_ib = new Rendering::IndexBuffer();
-		_basicShader = new Rendering::Shader(WORKING_DIRECTORY "res/shaders/Basic.shader");
+
+		Resources::ShaderAsset* shaderAsset = Resources::AssetDatabase
+		::GetAsset<Resources::ShaderAsset>(WORKING_DIRECTORY "res/shaders/Basic.shader");
+		_basicShader = new Rendering::Shader(shaderAsset);
 
 		Rendering::VertexBufferLayout layout;
 		layout.Push<float>(2);
@@ -202,6 +209,8 @@ protected:
 		delete _renderer;
 		glfwDestroyWindow(_window);
 
+		Resources::AssetDatabase::UnloadAllAssets();
+
 		printf("Deinit\n");
 	}
 
@@ -235,31 +244,12 @@ private:
 	}
 };
 
-#include "AssetManagement/AssetDatabase.h"
-#include "AssetManagement/ShaderAsset.h"
-
 int main()
-{
-	Resources::Asset* shaderAsset = Resources::AssetDatabase
-	::GetAsset<Resources::ShaderAsset>(WORKING_DIRECTORY "res/shaders/Basic.shader");
-	// std::cout << *((std::string*)(assetPointer->GetData())) << std::endl;
-	// std::cout << *((std::string*)(assetPointer2->GetData())) << std::endl;
-	char* shaderData = (char*)shaderAsset->GetData();
-	std::cout << shaderData << std::endl;
-	Resources::AssetDatabase::PutBack(shaderAsset);
-
-	Resources::AssetDatabase::UnloadUnusedAssets();
-	Resources::AssetDatabase::UnloadAllAssets();
-
-	std::cout << shaderData << std::endl;
-
-	// std::cout << *((std::string*)(assetPointer2->GetData())) << std::endl;
-
-
-	// App* app = new TestApp();
-
-	// int exitCode = app->Run();
-
-	// delete(app);
-	// return exitCode;
+{	
+	App* app = new TestApp();
+	
+	int exitCode = app->Run();
+	
+	delete app;
+	return exitCode;
 }

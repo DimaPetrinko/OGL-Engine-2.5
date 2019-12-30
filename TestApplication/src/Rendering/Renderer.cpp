@@ -11,7 +11,7 @@ namespace Rendering
 	{
 		while (auto error = glGetError())
 		{
-			std::cout << "[OpenGL] " << error << " in " << function << " " << file << ":" << line;
+			std::cout << "[OpenGL] " << error << " in " << function << " " << file << ":" << line << std::endl;
 			return false;
 		}
 		return true;

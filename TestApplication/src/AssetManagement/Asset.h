@@ -6,14 +6,13 @@ namespace Resources
 	{
 	protected:
 		int _referenceCount = 0;
-		char* _data;
 	public:
-		// Asset(const std::string& fileName);
-		~Asset() { delete _data; }
+		//Asset(const std::string& fileName) :_data(nullptr) {}
+		virtual ~Asset() = default;
 
-		inline void IncreaseReferenceCount() { ++_referenceCount; }
-		inline void DecreaseReferenceCount() { if (--_referenceCount < 0) _referenceCount = 0; }
-		inline int GetReferenceCount() { return _referenceCount; }
-		inline void* GetData() const { return _data; }
+		void IncreaseReferenceCount() { ++_referenceCount; }
+		void DecreaseReferenceCount() { if (--_referenceCount < 0) _referenceCount = 0; }
+		int GetReferenceCount() const { return _referenceCount; }
+		virtual void* GetData() const = 0;
 	};
 }
