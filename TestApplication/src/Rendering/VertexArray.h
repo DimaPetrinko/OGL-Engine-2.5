@@ -31,13 +31,12 @@ namespace Rendering
 		std::vector<VertexBufferElement> elements;
 		unsigned int stride{};
 	public:
-		template<typename T>
-		void Push(const unsigned int& count) {}
+		template <typename T>
+		void Push(const unsigned int& count);
 
 		inline const std::vector<VertexBufferElement>& GetElements() const { return elements; }
 		inline unsigned int GetStride() const { return stride; }
 	};
-
 
 	class VertexArray : public GraphicsObject
 	{

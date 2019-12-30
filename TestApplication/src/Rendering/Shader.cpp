@@ -1,14 +1,15 @@
 #include "Shader.h"
 
+#include <iostream>
 #include <fstream>
-#include <sstream>
+#include "AssetManagement/ShaderAsset.h"
 #include "Rendering.h"
 
 namespace Rendering
 {
-	Shader::Shader(const std::string& filePath)
+	Shader::Shader(const Resources::ShaderAsset* asset)
 	{
-		auto[vertexShaderSource, fragmentShaderSource] = ParseShader(filePath);
+		auto [vertexShaderSource, fragmentShaderSource] = ParseShader((std::string*)asset->GetData());
 		_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
 	}
 
@@ -47,29 +48,27 @@ namespace Rendering
 		return location;
 	}
 
-	std::tuple<std::string, std::string> Shader::ParseShader(const std::string& filePath) const
+	std::tuple<std::string, std::string> Shader::ParseShader(const std::string* shaderData) const
 	{
-		std::ifstream stream(filePath);
-		if (stream.fail()) printf("%s doesn't exist\n", filePath);
-
 		enum class ShaderType
 		{
-			None = -1, Vertex = 0, Fragment = 1
+			None = -1,
+			Vertex = 0,
+			Fragment = 1
 		};
 
-		std::string line;
-		std::stringstream ss[2];
-		ShaderType type = ShaderType::None;
-		while (getline(stream, line))
+		const unsigned int vertexStart = shaderData->find("#shader vertex");
+		const unsigned int fragmentStart = shaderData->find("#shader fragment");
+		const unsigned int size = shaderData->size();
+
+		if (vertexStart == std::string::npos || fragmentStart == std::string::npos)
 		{
-			if (line.find("#shader") != std::string::npos)
-			{
-				if (line.find("vertex") != std::string::npos) type = ShaderType::Vertex;
-				else if (line.find("fragment") != std::string::npos) type = ShaderType::Fragment;
-			}
-			else ss[(int)type] << line << "\n";
+			printf("Shader data is invalid! Aborting");
+			return {};
 		}
-		return { ss[0].str(), ss[1].str() };
+
+		return { (shaderData->substr(vertexStart + 15, fragmentStart - vertexStart - 15)),
+			(shaderData->substr(fragmentStart + 17, size - fragmentStart - 17)) };
 	}
 
 	unsigned int Shader::CompileShader(unsigned int type, const std::string& source)

@@ -68,5 +68,6 @@ workspace "OGL-Engine-2.5"
 			defines { "PLATFORM_LINUX64" }
 			links {"glfw", "GLEW", "GL"}
 		filter {}
+	 	libdirs {"%{prj.name}/lib/%{cfg.platform}"}
 
 		-- links {"OGLEngine2"}

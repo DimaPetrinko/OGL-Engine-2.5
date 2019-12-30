@@ -1,8 +1,8 @@
 #pragma once
 
-#include <iostream>
 #include <tuple>
 #include <unordered_map>
+#include "AssetManagement/ShaderAsset.h"
 #include "GraphicsObject.h"
 
 namespace Rendering
@@ -13,7 +13,7 @@ namespace Rendering
 		std::unordered_map<std::string, int> _uniformLocations;
 
 	public:
-		Shader(const std::string& filePath);
+		Shader(const Resources::ShaderAsset* asset);
 		~Shader();
 		void Bind() const override;
 		void Unbind() const override;
@@ -22,7 +22,7 @@ namespace Rendering
 		void SetUniformMatrix4fv(const std::string& name, float m[16]);
 
 	private:
-		std::tuple<std::string, std::string> ParseShader(const std::string& filePath) const;
+		std::tuple<std::string, std::string> ParseShader(const std::string* shaderData) const;
 		unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
 		unsigned int CompileShader(unsigned int type, const std::string& source);
 		int GetUniformLocation(const std::string& name);
