@@ -52,6 +52,7 @@ workspace "OGL-Engine-2.5"
 		kind "ConsoleApp"
 
 		files "%{prj.name}/src/**"
+		files "%{prj.name}/include/**"
 		includedirs
 		{
 			"%{prj.name}/src/",

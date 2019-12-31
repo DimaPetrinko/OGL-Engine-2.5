@@ -21,9 +21,9 @@ namespace Resources
 	{
 		if (_assets.find(filePath) != AssetDatabase::_assets.end())
 		{
-			T* asset = (T*)_assets.at(filePath);
+			Asset* asset = _assets.at(filePath);
 			asset->IncreaseReferenceCount();
-			return asset;
+			return (T*)asset;
 		}
 		T* asset = new T(filePath);
 		asset->IncreaseReferenceCount();
