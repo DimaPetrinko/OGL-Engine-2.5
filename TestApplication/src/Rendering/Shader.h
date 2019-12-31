@@ -10,10 +10,11 @@ namespace Rendering
 	class Shader : public GraphicsObject
 	{
 	private:
+		Resources::ShaderAsset* _asset;
 		std::unordered_map<std::string, int> _uniformLocations;
 
 	public:
-		Shader(const Resources::ShaderAsset* asset);
+		Shader(Resources::ShaderAsset* asset);
 		~Shader();
 		void Bind() const override;
 		void Unbind() const override;

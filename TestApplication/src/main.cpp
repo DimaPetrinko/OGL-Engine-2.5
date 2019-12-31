@@ -245,11 +245,11 @@ private:
 };
 
 int main()
-{	
+{
 	App* app = new TestApp();
-	
+
 	int exitCode = app->Run();
-	
+
 	delete app;
 	return exitCode;
 }

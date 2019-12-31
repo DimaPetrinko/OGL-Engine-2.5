@@ -5,10 +5,10 @@ namespace Resources
 {
 	std::unordered_map<std::string, Asset*> AssetDatabase::_assets;
 
-	void AssetDatabase::PutBack(Asset*& asset)
+	void AssetDatabase::PutBack(Asset** asset)
 	{
-		asset->DecreaseReferenceCount();
-		asset = nullptr;
+		(*asset)->DecreaseReferenceCount();
+		*asset = nullptr;
 	}
 
 

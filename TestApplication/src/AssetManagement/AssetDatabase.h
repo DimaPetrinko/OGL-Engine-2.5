@@ -12,7 +12,7 @@ namespace Resources
 	public:
 		template<typename T> static T* GetAsset(const std::string& filePath);
 
-		static void PutBack(Asset*& asset);
+		static void PutBack(Asset** asset);
 		static void UnloadUnusedAssets();
 		static void UnloadAllAssets();
 	};

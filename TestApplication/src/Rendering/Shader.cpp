@@ -2,19 +2,22 @@
 
 #include <iostream>
 #include <fstream>
+#include "AssetManagement/AssetDatabase.h"
 #include "AssetManagement/ShaderAsset.h"
 #include "Rendering.h"
 
 namespace Rendering
 {
-	Shader::Shader(const Resources::ShaderAsset* asset)
+	Shader::Shader(Resources::ShaderAsset* asset)
 	{
+		_asset = asset;
 		auto [vertexShaderSource, fragmentShaderSource] = ParseShader((std::string*)asset->GetData());
 		_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
 	}
 
 	Shader::~Shader()
 	{
+		Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_asset);
 		GLCall(glDeleteProgram(_rendererId));
 	}
 
