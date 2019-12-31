@@ -2,22 +2,29 @@
 
 #include <iostream>
 #include <fstream>
-#include "AssetManagement/AssetDatabase.h"
-#include "AssetManagement/ShaderAsset.h"
+#include <sstream>
 #include "Rendering.h"
 
 namespace Rendering
 {
-	Shader::Shader(Resources::ShaderAsset* asset)
+	Shader::Shader(const std::string& filePath)
 	{
-		_asset = asset;
-		auto [vertexShaderSource, fragmentShaderSource] = ParseShader((std::string*)asset->GetData());
+		std::ifstream stream(filePath);
+		if (stream.fail()) printf("%s doesn't exist\n", filePath);
+
+		std::stringstream ss;
+		std::string line;
+
+		while (getline(stream, line)) ss << line << "\n";
+		std::string* data = new std::string(ss.str());
+
+		auto [vertexShaderSource, fragmentShaderSource] = ParseShader(data);
 		_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
+		delete data;
 	}
 
 	Shader::~Shader()
 	{
-		Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_asset);
 		GLCall(glDeleteProgram(_rendererId));
 	}
 

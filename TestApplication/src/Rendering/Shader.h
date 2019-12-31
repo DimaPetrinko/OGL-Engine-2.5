@@ -2,19 +2,18 @@
 
 #include <tuple>
 #include <unordered_map>
-#include "AssetManagement/ShaderAsset.h"
+#include "AssetManagement/Asset.h"
 #include "GraphicsObject.h"
 
 namespace Rendering
 {
-	class Shader : public GraphicsObject
+	class Shader : public GraphicsObject, public Resources::Asset
 	{
 	private:
-		Resources::ShaderAsset* _asset;
 		std::unordered_map<std::string, int> _uniformLocations;
 
 	public:
-		Shader(Resources::ShaderAsset* asset);
+		Shader(const std::string& filePath);
 		~Shader();
 		void Bind() const override;
 		void Unbind() const override;

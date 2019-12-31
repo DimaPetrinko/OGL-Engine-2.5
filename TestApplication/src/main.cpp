@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Maths.h"
 #include "AssetManagement/AssetDatabase.h"
-#include "AssetManagement/ShaderAsset.h"
 #include "Rendering/Rendering.h"
 #include "Rendering/Renderer.h"
 #include "Rendering/IndexBuffer.h"
@@ -135,9 +134,8 @@ protected:
 		_va = new Rendering::VertexArray();
 		_ib = new Rendering::IndexBuffer();
 
-		Resources::ShaderAsset* shaderAsset = Resources::AssetDatabase
-		::GetAsset<Resources::ShaderAsset>(WORKING_DIRECTORY "res/shaders/Basic.shader");
-		_basicShader = new Rendering::Shader(shaderAsset);
+		_basicShader = Resources::AssetDatabase::GetAsset<Rendering::Shader>
+		(WORKING_DIRECTORY "res/shaders/Basic.shader");
 
 		Rendering::VertexBufferLayout layout;
 		layout.Push<float>(2);
@@ -205,10 +203,10 @@ protected:
 		delete _vb;
 		delete _ib;
 		delete _va;
-		delete _basicShader;
 		delete _renderer;
 		glfwDestroyWindow(_window);
 
+		Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_basicShader);
 		Resources::AssetDatabase::UnloadAllAssets();
 
 		printf("Deinit\n");
