@@ -50,7 +50,7 @@ namespace Rendering
 
 	void Shader::SetUniformMatrix4fv(const std::string& name, float m[16])
 	{
-		GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_TRUE, m));
+		GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, m));
 	}
 
 	int Shader::GetUniformLocation(const std::string& name)

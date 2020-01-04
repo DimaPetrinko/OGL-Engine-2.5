@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Timer.h"
 #include "Maths.h"
 #include "AssetManagement/AssetDatabase.h"
 #include "Rendering/Rendering.h"
@@ -8,6 +9,8 @@
 #include "Rendering/VertexArray.h"
 #include "Rendering/Shader.h"
 #include "Rendering/Texture.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #ifdef PLATFORM_WIN64
 #define WORKING_DIRECTORY ""
@@ -112,8 +115,11 @@ class TestApp final : public App
 {
 private:
 
-	int _windowWidth = 480;
-	int _windowHeight = 320;
+	float _windowWidth = 480.0f;
+	float _windowHeight = 320.0f;
+	// glm::mat4 projMat = glm::ortho(-_windowWidth / 2, _windowWidth / 2,
+			// -_windowHeight / 2, _windowHeight / 2, -1.0f, 1.0f);
+	glm::mat4 projMat = glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, 0.0f, 1.0f);
 
 	Quad _quad;
 	Rendering::Renderer* _renderer;
@@ -126,14 +132,10 @@ private:
 	Vector2 _direction;
 
 public:
-	TestApp() : /*_quad(Quad(Vertex(Vector2(-50.0f, -50.0f), Vector2(0.0f, 0.0f)),
+	TestApp() :	_quad(Quad(Vertex(Vector2(-50.0f, -50.0f), Vector2(0.0f, 0.0f)),
 						   Vertex(Vector2(50.0f, -50.0f), Vector2(1.0f, 0.0f)),
 						   Vertex(Vector2(50.0f, 50.0f), Vector2(1.0f, 1.0f)),
-						   Vertex(Vector2(-50.0f, 50.0f), Vector2(0.0f, 1.0f)))),*/
-				_quad(Quad(Vertex(Vector2(-.5f, -.5f), Vector2(0.0f, 0.0f)),
-						   Vertex(Vector2(.5f, -.5f), Vector2(1.0f, 0.0f)),
-						   Vertex(Vector2(.5f, .5f), Vector2(1.0f, 1.0f)),
-						   Vertex(Vector2(-.5f, .5f), Vector2(0.0f, 1.0f)))),
+						   Vertex(Vector2(-50.0f, 50.0f), Vector2(0.0f, 1.0f)))),
 				_step(Vector2(2.f, 0.5f)),
 				_direction(Vector2(_step.x, _step.y)){}
 
@@ -159,6 +161,12 @@ protected:
 		(WORKING_DIRECTORY "res/shaders/Basic.shader");
 		_texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
 		(WORKING_DIRECTORY "res/textures/image.png");
+
+		GLCall(glEnable(GL_BLEND));
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+		static float* positions = _quad.GetPositions();
+		_vb->SetData(positions, 4 * 4 * sizeof(float));
 
 		Rendering::VertexBufferLayout layout;
 		layout.Push<float>(2);
@@ -190,39 +198,38 @@ protected:
 	int UpdateLogic() override
 	{
 		// printf("UpdateLogic\n");
-		if (_quad.GetPosition().x > _windowWidth) _direction.x = -_step.x;
-		else if (_quad.GetPosition().x < 0) _direction.x = _step.x;
-		if (_quad.GetPosition().y > _windowHeight) _direction.y = -_step.y;
-		else if (_quad.GetPosition().y < 0) _direction.y = _step.y;
+		auto position = _quad.GetPosition();
+		if (position.x > _windowWidth) _direction.x = -_step.x;
+		else if (position.x < 0) _direction.x = _step.x;
+		if (position.y > _windowHeight) _direction.y = -_step.y;
+		else if (position.y < 0) _direction.y = _step.y;
 
-		// _quad.Move(_direction);
+		_quad.Move(_direction);
 
 		return EXITCODE_RUN;
 	}
 
 	int UpdateScreen() override
 	{
+			Timer timer = Timer();
 		// printf("UpdateScreen\n");
 		if (glfwWindowShouldClose(_window)) return EXITCODE_EXIT;
 
-		static float* positions = _quad.GetPositions();
-		static unsigned int* indices = _quad.GetIndices();
-		Vector2 positionNormalized = _quad.GetPosition().Normalized();
+		Vector2 position = _quad.GetPosition();
+		glm::vec3 modelMovement(position.x, position.y, 0.0f);
+		glm::vec3 cameraMovement(0.0f, 0.0f, 0.0f);
 
-		float mvpMatrix[16] =
-		{
-			2.0f/_windowWidth, 0, 0, -1,
-			0, 2.0f/_windowHeight, 0, -1,
-			0, 0, 1, 0,
-			0, 0, 0, 1,
-		};
-
-		_vb->SetData(positions, 4 * 4 * sizeof(float));
+		glm::mat4 identityMat(1.0f);
+		glm::mat4 modelMat = glm::translate(identityMat, modelMovement);
+		glm::mat4 viewMat = glm::translate(identityMat, -cameraMovement);
+		glm::mat4 mvp = projMat * viewMat * modelMat;
 
 		_shader->Bind();
-		// _shader->SetUniform4f("u_Color", positionNormalized.x, 10.0f, positionNormalized.y, 1.0f);
-		_shader->SetUniform4f("u_Color", 0.5f, 1.0f, 0.8f, 1.0f);
-		_shader->SetUniformMatrix4fv("u_Mvp", mvpMatrix);
+		_shader->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+		_shader->SetUniformMatrix4fv("u_Mvp", &mvp[0][0]);
+		// _shader->SetUniformMatrix4fv("u_M", &modelMat[0][0]);
+		// _shader->SetUniformMatrix4fv("u_V", &viewMat[0][0]);
+		// _shader->SetUniformMatrix4fv("u_P", &projMat[0][0]);
 		_texture->Bind();
 
 		_renderer->Clear();
