@@ -9,7 +9,7 @@ namespace Rendering
 	private:
 		unsigned int count{};
 	public:
-		IndexBuffer();
+		IndexBuffer(const bool& glInitialized);
 		~IndexBuffer();
 
 		void SetData(const unsigned int* data, const unsigned int count);
