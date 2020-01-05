@@ -29,11 +29,11 @@ namespace Application
 
 	bool TestApp::UpdateLogic()
 	{
-		static glm::vec3 step = glm::vec3(5.0f, 5.0f, 0.0f);
+		static glm::vec3 step = glm::vec3(5.0f, 5.0f, 0.0f) / 4.0f;
 		static glm::vec3 direction = step;
-		if (_position.x > _renderer.WindowWidth()) direction.x = -step.x;
+		if (_position.x > _renderer.WindowWidth()/3) direction.x = -step.x;
 		else if (_position.x < 0) direction.x = step.x;
-		if (_position.y > _renderer.WindowHeight()) direction.y = -step.y;
+		if (_position.y > _renderer.WindowHeight()/3) direction.y = -step.y;
 		else if (_position.y < 0) direction.y = step.y;
 
 		_position += direction;
@@ -45,16 +45,29 @@ namespace Application
 	{
 		if (_renderer.IsWindowClosed()) return false;
 
-		glm::vec3 cameraMovement(0.0f, 0.0f, 0.0f);
+		glm::vec3 scale(1.0f, 1.0f, 1.0f);
+
+		// glm::vec3 cameraMovement(_renderer.WindowWidth(), _renderer.WindowHeight(), 700.0f);
+		glm::vec3 cameraMovement(200.0f, 150.0f, 300.0f);
+		// glm::vec3 cameraMovement(0.0f, 0.0f, 0.0f);
 
 		glm::mat4 identityMat(1.0f);
-		glm::mat4 modelMat = glm::translate(identityMat, _position);
+
+		glm::mat4 t = glm::translate(identityMat, _position);
+		glm::mat4 rX = glm::rotate(identityMat, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 rY = glm::rotate(identityMat, 0.0f/*3.14f / 2*/, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 rZ = glm::rotate(identityMat, 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 r = rX * rY * rZ;
+		glm::mat4 s = glm::scale(identityMat, scale);
+
+		glm::mat4 modelMat = t * r * s;
 		glm::mat4 viewMat = glm::translate(identityMat, -cameraMovement);
 		glm::mat4 mvp = _renderer.ProjectionMatrix() * viewMat * modelMat;
 
 		_shader->Bind();
 		_shader->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
 		_shader->SetUniformMatrix4fv("u_Mvp", &mvp[0][0]);
+		_shader->SetUniformMatrix4fv("u_M", &modelMat[0][0]);
 
 		_renderer.Clear();
 		_renderer.Draw(_ib, _va, _shader);
@@ -71,32 +84,63 @@ namespace Application
 		return true;
 	}
 
+	struct Vertex
+	{
+		glm::vec3 _position;
+		glm::vec2 _texCoord;
+		glm::vec3 _normal;
+	};
+
+	void CalculateNormals(const unsigned int* indices, unsigned int indicesCount,
+		Vertex* vertices, unsigned int verticesCount)
+	{
+		for (unsigned int i = 0 ; i < indicesCount ; i += 3)
+		{
+			unsigned int i0 = indices[i];
+			unsigned int i1 = indices[i + 1];
+			unsigned int i2 = indices[i + 2];
+			glm::vec3 v1 = vertices[i1]._position - vertices[i0]._position;
+			glm::vec3 v2 = vertices[i2]._position - vertices[i0]._position;
+			glm::vec3 normal = glm::cross(v1, v2);
+			normal = glm::normalize(normal);
+
+			vertices[i0]._normal = normal;
+		}
+
+		for (unsigned int i = 0 ; i < verticesCount ; i++)
+		{
+			vertices[i]._normal = glm::normalize(vertices[i]._normal);
+		}
+	}
+
 	bool TestApp::SetUpGraphicsObjects()
 	{
-		GLCall(glEnable(GL_BLEND));
-		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+		unsigned int indicesCount = 3 * 3;
+		unsigned int indices[] = {3, 0, 2, 0, 3, 1, 2, 1, 3};
+		_ib.SetData(&indices[0], indicesCount);
 
-		float positions[] =
+		unsigned int verticesCount = 4;
+		Vertex vertices[] =
 		{
-			-50.0f, -50.0f,  0.0f,  0.0f,
-			50.0f, -50.0f,  1.0f,  0.0f,
-			50.0f,  50.0f,  1.0f,  1.0f,
-			-50.0f,  50.0f,  0.0f,  1.0f
+			Vertex {glm::vec3(-50.0f, 0.0f,  0.0f),  glm::vec2(0.0f, 0.0f)},
+			Vertex {glm::vec3( 50.0f, 0.0f,  0.0f),  glm::vec2(1.0f, 0.0f)},
+			Vertex {glm::vec3( 0.0f,  50.0f, 0.0f),  glm::vec2(0.5f, 1.0f)},
+			Vertex {glm::vec3( 0.0f,  25.0f, 50.0f), glm::vec2(0.5f, 0.5f)}
 		};
-		unsigned int indices[] = {0, 1, 2, 2, 3, 0};
-		_vb.SetData(&positions[0], 4 * 4 * sizeof(float));
+		CalculateNormals(indices, indicesCount, vertices, verticesCount);
+		_vb.SetData(&vertices[0], verticesCount * sizeof(Vertex));
 
 		Rendering::VertexBufferLayout layout;
+		layout.Push<float>(3);
 		layout.Push<float>(2);
-		layout.Push<float>(2);
+		layout.Push<float>(3);
 		_va.AddBuffer(_vb, layout);
 
-		_ib.SetData(&indices[0], 6);
-
-		_shader->Bind();
 		int slot = 1;
+		_shader->Bind();
 		_texture->Bind(slot);
 		_shader->SetUniform1i("u_Texture", slot);
+
 		return true;
 	}
 

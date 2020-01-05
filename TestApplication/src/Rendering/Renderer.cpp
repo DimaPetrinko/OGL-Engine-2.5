@@ -32,8 +32,19 @@ namespace Rendering
 			std::cout << glewGetErrorString(error) << std::endl;
 			_isInitialized = false;
 		}
-		_projectionMatrix = glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, 0.0f, 1.0f);
+		_projectionMatrix =
+			glm::perspectiveFov(20.0f, _windowWidth, _windowHeight, 0.0f, 100.0f);
+			// glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, -100.0f, 100.0f);
 		printf("GL version: %s\n", glGetString(GL_VERSION));
+
+
+		// GLCall(glEnable(GL_BLEND));
+		// GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+		GLCall(glFrontFace(GL_CW));
+		GLCall(glCullFace(GL_BACK));
+		GLCall(glEnable(GL_CULL_FACE));
+
 		_isInitialized = true;
 	}
 

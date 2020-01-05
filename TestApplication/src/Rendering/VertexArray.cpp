@@ -38,6 +38,7 @@ namespace Rendering
 				layout.GetStride(), (const void*)offset));
 			offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 		}
+		vb.Unbind();
 		// glVertexAttribPointer(attribute index, elements count, GL_FLOAT, normalize (for 0 .. 255 byte or smth),
 		// size of vertex in bytes (includes texture coords), starting index (in bytes));
 		Unbind();

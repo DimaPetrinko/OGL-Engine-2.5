@@ -2,7 +2,7 @@
 
 int main()
 {
-	Application::App* app = new Application::TestApp(480.0f, 320.0f);
+	Application::App* app = new Application::TestApp(1280.0f, 720.0f);
 	app->Run();
 	delete app;
 }
