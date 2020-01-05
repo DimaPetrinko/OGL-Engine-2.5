@@ -9,13 +9,17 @@ namespace Application
 		&& LoadAssets()
 		&& SetUpGraphicsObjects()
 		&& UnbindAll()) _running = true;
-		else _running = false;
+		else
+		{
+			printf("Could not initialize application\n");
+			_running = false;
+		}
 	}
 
 	TestApp::~TestApp()
 	{
-		Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_shader);
-		Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_texture);
+		if (_shader != nullptr) Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_shader);
+		if (_texture != nullptr) Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_texture);
 	}
 
 	bool TestApp::UpdateInput()
