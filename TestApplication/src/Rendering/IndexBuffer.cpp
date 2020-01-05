@@ -3,8 +3,9 @@
 
 namespace Rendering
 {
-	IndexBuffer::IndexBuffer()
+	IndexBuffer::IndexBuffer(const bool& glInitialized)
 	{
+		if (!glInitialized) return;
 		GLCall(glGenBuffers(1, &_rendererId));
 	}
 

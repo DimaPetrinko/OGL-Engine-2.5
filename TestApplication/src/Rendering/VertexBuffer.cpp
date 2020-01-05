@@ -4,9 +4,11 @@
 
 namespace Rendering
 {
-	VertexBuffer::VertexBuffer()
+	VertexBuffer::VertexBuffer(const bool& glInitialized)
 	{
-		GLCall(glGenBuffers(1, &_rendererId));
+		if (!glInitialized) return;
+		GLCall(glGenBuffers(1, &_rendererId)); // segmentation fault because gl is not initialized yet
+		// it's trying to construct this in default constructor of the App
 	}
 
 	VertexBuffer::~VertexBuffer()

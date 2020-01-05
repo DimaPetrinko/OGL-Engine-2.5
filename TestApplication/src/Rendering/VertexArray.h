@@ -41,11 +41,11 @@ namespace Rendering
 	class VertexArray : public GraphicsObject
 	{
 	public:
-		VertexArray();
+		VertexArray(const bool& glInitialized);
 		~VertexArray();
 
 		void Bind() const override;
 		void Unbind() const override;
-		void AddBuffer(const VertexBuffer* vb, const VertexBufferLayout& layout);
+		void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
 	};
 }
