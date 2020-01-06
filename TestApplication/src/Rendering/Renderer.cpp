@@ -32,8 +32,7 @@ namespace Rendering
 			std::cout << glewGetErrorString(error) << std::endl;
 			_isInitialized = false;
 		}
-		_projectionMatrix =
-			glm::perspectiveFov(20.0f, _windowWidth, _windowHeight, 0.0f, 100.0f);
+		ProjectionMatrix = glm::perspectiveFov(20.0f, _windowWidth, _windowHeight, 0.0f, 100.0f);
 			// glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, -100.0f, 100.0f);
 		printf("GL version: %s\n", glGetString(GL_VERSION));
 

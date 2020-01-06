@@ -10,6 +10,7 @@ namespace Rendering
 
 	VertexArray::~VertexArray()
 	{
+		if (_rendererId == 0) return;
 		GLCall(glDeleteVertexArrays(1, &_rendererId));
 	}
 

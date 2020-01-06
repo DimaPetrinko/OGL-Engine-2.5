@@ -12,6 +12,7 @@ namespace Rendering
 
 	VertexBuffer::~VertexBuffer()
 	{
+		if (_rendererId == 0) return;
 		GLCall(glDeleteBuffers(1, &_rendererId));
 	}
 

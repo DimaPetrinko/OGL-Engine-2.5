@@ -25,6 +25,7 @@ namespace Rendering
 
 	Shader::~Shader()
 	{
+		if (_rendererId == 0) return;
 		GLCall(glDeleteProgram(_rendererId));
 	}
 

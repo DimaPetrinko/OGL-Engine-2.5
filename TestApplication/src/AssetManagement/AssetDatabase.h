@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include "Asset.h"
 
+#define ToAssetReference(x) (Resources::Asset**)(void**)&x
+
 namespace Resources
 {
 	class AssetDatabase

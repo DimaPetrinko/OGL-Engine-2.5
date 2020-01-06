@@ -32,6 +32,7 @@ namespace Rendering
 
 	Texture::~Texture()
 	{
+		if (_rendererId == 0) return;
 		GLCall(glDeleteTextures(1, &_rendererId));
 	}
 
