@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "Rendering.h"
+#include "GL.h"
 
 namespace Rendering
 {

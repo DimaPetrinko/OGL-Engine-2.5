@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "Rendering.h"
+#include "GL.h"
 #include "GraphicsObject.h"
 #include "VertexBuffer.h"
 

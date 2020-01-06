@@ -1,4 +1,3 @@
-#include "Rendering.h"
 #include "VertexArray.h"
 
 namespace Rendering

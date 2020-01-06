@@ -1,6 +1,6 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
-#include "Rendering.h"
+#include "GL.h"
 
 namespace Rendering
 {

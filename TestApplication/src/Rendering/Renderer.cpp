@@ -1,7 +1,7 @@
 #include "Renderer.h"
 
 #include <iostream>
-#include "Rendering.h"
+#include "GL.h"
 
 namespace Rendering
 {

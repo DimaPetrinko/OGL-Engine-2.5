@@ -2,7 +2,7 @@
 
 #include <string>
 #include "GraphicsObject.h"
-#include "Rendering/Rendering.h"
+#include "GL.h"
 #include "AssetManagement/Asset.h"
 
 namespace Rendering

@@ -3,7 +3,7 @@
 #include <iostream>
 #include "App.h"
 #include "AssetManagement/AssetDatabase.h"
-#include "Rendering/Rendering.h"
+#include "Rendering/GL.h"
 #include "Rendering/Renderer.h"
 #include "Rendering/VertexBuffer.h"
 #include "Rendering/VertexArray.h"

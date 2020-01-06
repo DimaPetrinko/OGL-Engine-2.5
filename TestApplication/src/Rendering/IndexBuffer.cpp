@@ -1,4 +1,4 @@
-#include "Rendering.h"
+#include "GL.h"
 #include "IndexBuffer.h"
 
 namespace Rendering
