@@ -24,6 +24,7 @@ namespace Rendering
 		static bool IsInitialized() { return _isInitialized; }
 		float WindowWidth() const { return _windowWidth; }
 		float WindowHeight() const { return _windowHeight; }
+		GLFWwindow* GetWindow() const { return _window; }
 		glm::mat4 ProjectionMatrix() const { return _projectionMatrix; }
 		bool IsWindowClosed() const;
 		void Clear() const;

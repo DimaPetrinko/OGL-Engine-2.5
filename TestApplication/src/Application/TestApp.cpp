@@ -6,6 +6,7 @@ namespace Application
 		_vb(_renderer.IsInitialized()), _ib(_renderer.IsInitialized()), _va(_renderer.IsInitialized())
 	{
 		if (_renderer.IsInitialized()
+		&& InitializeGUI()
 		&& LoadAssets()
 		&& SetUpGraphicsObjects()
 		&& UnbindAll()) _running = true;
@@ -18,8 +19,74 @@ namespace Application
 
 	TestApp::~TestApp()
 	{
+		DeinitializeGUI();
 		if (_shader != nullptr) Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_shader);
 		if (_texture != nullptr) Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_texture);
+	}
+
+	bool TestApp::InitializeGUI()
+	{
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+
+		ImGui_ImplGlfw_InitForOpenGL(_renderer.GetWindow(), true);
+		ImGui_ImplOpenGL3_Init("#version 330");
+
+		return true;
+	}
+
+	bool TestApp::DeinitializeGUI()
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+		return true;
+	}
+
+	bool TestApp::UpdateGUI()
+	{
+		using namespace ImGui;
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		NewFrame();
+
+		SetNextWindowPos(ImVec2(_renderer.WindowWidth(), 0.0f), ImGuiCond_Once, ImVec2(1.0f, 0.0f));
+		SetNextWindowSize(ImVec2(350.0f, _renderer.WindowHeight()), ImGuiCond_Once);
+
+		if (Begin("Inspector", nullptr,
+		ImGuiWindowFlags_NoCollapse
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoMove))
+
+		{
+			ShowTransform("Model", false, &_modelPosition, &_modelRotation, &_modelScale);
+
+			Separator();
+			Spacing();
+
+			ShowTransform("Camera", false, &_cameraPosition, &_cameraRotation);
+
+			End();
+		}
+
+		Render();
+		ImGui_ImplOpenGL3_RenderDrawData(GetDrawData());
+
+		return true;
+	}
+
+	void TestApp::ShowTransform(const char* title, const bool collapsed, glm::vec3* position,
+		glm::vec3* rotation, glm::vec3* scale)
+	{
+		using namespace ImGui;
+		if (!collapsed) SetNextItemOpen(true, ImGuiCond_Once);
+		if (TreeNode(title))
+		{
+			if (position != nullptr) SliderFloat3("Position", &position->x, -500.0f, 500.0f, "%.3f");
+			if (rotation != nullptr) SliderFloat3("Rotation", &rotation->x, -360.0f, 360.0f, "%.3f");
+			if (scale != nullptr) SliderFloat3("Scale", &scale->x, -5.0f, 5.0f, "%.3f");
+			TreePop();
+		}
 	}
 
 	bool TestApp::UpdateInput()
@@ -29,14 +96,14 @@ namespace Application
 
 	bool TestApp::UpdateLogic()
 	{
-		static glm::vec3 step = glm::vec3(5.0f, 5.0f, 0.0f) / 4.0f;
-		static glm::vec3 direction = step;
-		if (_position.x > _renderer.WindowWidth()/3) direction.x = -step.x;
-		else if (_position.x < 0) direction.x = step.x;
-		if (_position.y > _renderer.WindowHeight()/3) direction.y = -step.y;
-		else if (_position.y < 0) direction.y = step.y;
+		// static glm::vec3 step = glm::vec3(5.0f, 5.0f, 0.0f) / 4.0f;
+		// static glm::vec3 direction = step;
+		// if (_position.x > _renderer.WindowWidth()/3) direction.x = -step.x;
+		// else if (_position.x < 0) direction.x = step.x;
+		// if (_position.y > _renderer.WindowHeight()/3) direction.y = -step.y;
+		// else if (_position.y < 0) direction.y = step.y;
 
-		_position += direction;
+		// _position += direction;
 
 		return true;
 	}
@@ -45,23 +112,25 @@ namespace Application
 	{
 		if (_renderer.IsWindowClosed()) return false;
 
-		glm::vec3 scale(1.0f, 1.0f, 1.0f);
+		glm::vec3 xAxis = glm::vec3(1.0f, 0.0f, 0.0f);
+		glm::vec3 yAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 zAxis = glm::vec3(0.0f, 0.0f, 1.0f);
 
-		// glm::vec3 cameraMovement(_renderer.WindowWidth(), _renderer.WindowHeight(), 700.0f);
-		glm::vec3 cameraMovement(200.0f, 150.0f, 300.0f);
-		// glm::vec3 cameraMovement(0.0f, 0.0f, 0.0f);
+		auto modelRadians = glm::radians(_modelRotation);
+		glm::mat4 modelMat(1.0f);
+		modelMat = glm::translate(modelMat, _modelPosition);
+		modelMat = glm::rotate(modelMat, modelRadians.x, xAxis);
+		modelMat = glm::rotate(modelMat, modelRadians.y, yAxis);
+		modelMat = glm::rotate(modelMat, modelRadians.z, zAxis);
+		modelMat = glm::scale(modelMat, _modelScale);
 
-		glm::mat4 identityMat(1.0f);
+		auto viewRadians = glm::radians(_cameraRotation);
+		glm::mat4 viewMat(1.0f);
+		viewMat = glm::rotate(viewMat, viewRadians.x, xAxis);
+		viewMat = glm::rotate(viewMat, viewRadians.y, yAxis);
+		viewMat = glm::rotate(viewMat, viewRadians.z, zAxis);
+		viewMat = glm::translate(viewMat, -_cameraPosition);
 
-		glm::mat4 t = glm::translate(identityMat, _position);
-		glm::mat4 rX = glm::rotate(identityMat, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 rY = glm::rotate(identityMat, 0.0f/*3.14f / 2*/, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rZ = glm::rotate(identityMat, 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 r = rX * rY * rZ;
-		glm::mat4 s = glm::scale(identityMat, scale);
-
-		glm::mat4 modelMat = t * r * s;
-		glm::mat4 viewMat = glm::translate(identityMat, -cameraMovement);
 		glm::mat4 mvp = _renderer.ProjectionMatrix() * viewMat * modelMat;
 
 		_shader->Bind();
@@ -71,6 +140,12 @@ namespace Application
 
 		_renderer.Clear();
 		_renderer.Draw(_ib, _va, _shader);
+
+		return true;
+	}
+
+	bool TestApp::FinishFrame()
+	{
 		_renderer.PostRender();
 		return true;
 	}
@@ -91,6 +166,7 @@ namespace Application
 		glm::vec3 _normal;
 	};
 
+	// move to renderer?
 	void CalculateNormals(const unsigned int* indices, unsigned int indicesCount,
 		Vertex* vertices, unsigned int verticesCount)
 	{
@@ -115,8 +191,14 @@ namespace Application
 
 	bool TestApp::SetUpGraphicsObjects()
 	{
-		unsigned int indicesCount = 3 * 3;
-		unsigned int indices[] = {3, 0, 2, 0, 3, 1, 2, 1, 3};
+		unsigned int indicesCount = 4 * 3; // n triangles
+		unsigned int indices[] =
+		{
+			2, 0, 1,
+			3, 1, 0,
+			1, 3, 2,
+			0, 2, 3
+		};
 		_ib.SetData(&indices[0], indicesCount);
 
 		unsigned int verticesCount = 4;

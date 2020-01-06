@@ -18,8 +18,12 @@ namespace Application
 		void Run();
 
 	protected:
+		virtual bool InitializeGUI() = 0;
+		virtual bool DeinitializeGUI() = 0;
+		virtual bool UpdateGUI() = 0;
 		virtual bool UpdateInput() = 0;
 		virtual bool UpdateLogic() = 0;
 		virtual bool UpdateScreen() = 0;
+		virtual bool FinishFrame() = 0;
 	};
 }

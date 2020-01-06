@@ -37,6 +37,9 @@ namespace Rendering
 			// glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, -100.0f, 100.0f);
 		printf("GL version: %s\n", glGetString(GL_VERSION));
 
+		int display_w, display_h;
+		glfwGetFramebufferSize(_window, &display_w, &display_h);
+		GLCall(glViewport(0, 0, display_w, display_h));
 
 		// GLCall(glEnable(GL_BLEND));
 		// GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -51,6 +54,7 @@ namespace Rendering
 	Renderer::~Renderer()
 	{
 		glfwDestroyWindow(_window);
+		glfwTerminate();
 	}
 
 	bool Renderer::IsWindowClosed() const
@@ -96,6 +100,7 @@ namespace Rendering
 			printf("Initialized GLFW. Version: %s\n", glfwGetVersionString());
 		}
 
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

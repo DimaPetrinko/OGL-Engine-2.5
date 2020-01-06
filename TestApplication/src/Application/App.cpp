@@ -11,6 +11,8 @@ namespace Application
 			_running = _running && UpdateInput();
 			_running = _running && UpdateLogic();
 			_running = _running && UpdateScreen();
+			_running = _running && UpdateGUI();
+			_running = _running && FinishFrame();
 		}
 		return;
 	}
