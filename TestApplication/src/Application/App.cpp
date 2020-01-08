@@ -2,8 +2,16 @@
 
 namespace Application
 {
+	void App::WarmUp()
+	{
+		_warmedUp = _warmedUp || InitializeGUI();
+		_warmedUp = _warmedUp && LoadAssets();
+		_running = _warmedUp;
+	}
+
 	void App::Run()
 	{
+		if (!_warmedUp) WarmUp();
 		if (!_running) return;
 
 		while (_running)

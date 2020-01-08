@@ -32,7 +32,7 @@ uniform sampler2D u_Texture;
 void main()
 {
 
-	float light = max( 0.0, dot(normalize(v_Normal), normalize(-vec3(0.5, 1.0, 0.0))));
+	float light = max( 0.0, dot(normalize(v_Normal), normalize(vec3(0.5, 1.0, 0.0))));
 	vec4 textureColor = texture2D(u_Texture, v_TextCoord);
 	color = textureColor * u_Color * (vec4(light) + vec4(0.1));
 }

@@ -18,9 +18,13 @@ namespace Rendering
 		while (getline(stream, line)) ss << line << "\n";
 		std::string* data = new std::string(ss.str());
 
-		auto [vertexShaderSource, fragmentShaderSource] = ParseShader(data);
-		_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
-		delete data;
+		if (data)
+		{
+			auto [vertexShaderSource, fragmentShaderSource] = ParseShader(data);
+			_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
+			delete data;
+		}
+		stream.close();
 	}
 
 	Shader::~Shader()

@@ -5,24 +5,23 @@
 #include "AssetManagement/Asset.h"
 #include "Rendering/Vertex.h"
 #include "Rendering/Triangle.h"
+#include "Rendering/VertexBuffer.h"
+#include "Rendering/VertexArray.h"
+#include "Rendering/IndexBuffer.h"
 
 namespace Rendering
 {
 	class Mesh : public Resources::Asset
 	{
 	private:
-		std::vector<Vertex> _vertices; // change to std array?
-		std::vector<Triangle> _triangles;
-		unsigned int _verticesCount;
-		unsigned int _trianglesCount;
+		VertexBuffer _vb; // maybe move to renderer for batching?
+		IndexBuffer _ib;
+		VertexArray _va;
 	public:
 		Mesh(const std::string& filePath);
 		~Mesh();
 
-		Vertex* GetVertices() { return &_vertices[0]; } // Dangerous! what if vector is realocated? the pointers
-		Triangle* GetTriangles() { return &_triangles[0]; } // received with these methods now point to invalid data
-		unsigned int GetVerticesCount() { return _verticesCount; }
-		unsigned int GetTrianglesCount() { return _trianglesCount; }
-		unsigned int GetIndicesCount() { return _trianglesCount * 3; }
+		VertexArray* GetVA() { return &_va; }
+		IndexBuffer* GetIB() { return &_ib; }
 	};
 }
