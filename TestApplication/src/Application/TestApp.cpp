@@ -32,7 +32,7 @@ namespace Application
 			(WORKING_DIRECTORY "res/shaders/Basic.shader");
 		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
 			(WORKING_DIRECTORY "res/textures/checker3.jpg");
-		_gameObject = new GameObject(&_renderer, mesh, texture, 1, shader);
+		_gameObject = new Systems::GameObject(&_renderer, mesh, texture, 1, shader);
 
 		// to increment reference count
 		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>("mesh");
@@ -40,7 +40,7 @@ namespace Application
 			(WORKING_DIRECTORY "res/shaders/Basic.shader");
 		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
 			(WORKING_DIRECTORY "res/textures/image.png");
-		_gameObject2 = new GameObject(&_renderer,mesh, texture, 2, shader);
+		_gameObject2 = new Systems::GameObject(&_renderer,mesh, texture, 2, shader);
 		_gameObject2->Transform.Position = {0.0f, 0.0f, -100.0f};
 		_gameObject2->Transform.Rotation = {0.0f, 45.0f, 0.0f};
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include "App.h"
 #include "AssetManagement/AssetDatabase.h"
-#include "GameObject.h"
+#include "Systems/GameObject.h"
 #include "Rendering/Renderer.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -19,9 +19,9 @@ namespace Application
 
 		Rendering::Renderer _renderer;
 
-		GameObject* _gameObject;
-		GameObject* _gameObject2;
-		TransformComponent _cameraTransform
+		Systems::GameObject* _gameObject;
+		Systems::GameObject* _gameObject2;
+		Systems::Components::TransformComponent _cameraTransform
 		{
 			glm::vec3(75.0f, 125.0f, 150.0f),
 			glm::vec3(30.0f, -30.0f, 0.0f),
