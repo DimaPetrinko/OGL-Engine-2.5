@@ -10,6 +10,7 @@ namespace Rendering
 
 	VertexArray::~VertexArray()
 	{
+		if (_rendererId == 0) return;
 		GLCall(glDeleteVertexArrays(1, &_rendererId));
 	}
 
@@ -33,21 +34,27 @@ namespace Rendering
 		{
 			const auto& element = elements[i];
 			GLCall(glEnableVertexAttribArray(i));
-			GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized,
+			GLCall(glVertexAttribPointer(i, element.count/*per object*/, element.type, element.normalized,
 				layout.GetStride(), (const void*)offset));
-			offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
+			offset += element.count/*total*/ * VertexBufferElement::GetSizeOfType(element.type);
 		}
 		vb.Unbind();
 		// glVertexAttribPointer(attribute index, elements count, GL_FLOAT, normalize (for 0 .. 255 byte or smth),
 		// size of vertex in bytes (includes texture coords), starting index (in bytes));
 		Unbind();
+
+		//GLCall(glVertexAttribPointer(i, element.countPerAttribute, element.type, element.normalized,
+		//		0?, (const void*)offset));
+		//	offset += element.totalCount * VertexBufferElement::GetSizeOfType(element.type);
 	}
 
 	template<>
-	void VertexBufferLayout::Push<float>(const unsigned int& count)
+	void VertexBufferLayout::Push<float>(const unsigned int& count/*, countPerAttribute*/)
 	{
 		elements.push_back({ GL_FLOAT, count, GL_FALSE });
 		stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
+		// include in buffer element
+		// stride += countPerAttribute * VertexBufferElement::GetSizeOfType(GL_FLOAT);
 	}
 
 	template<>

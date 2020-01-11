@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include "Asset.h"
 
+#define ToAssetReference(x) (Resources::Asset**)(void**)&x
+
 namespace Resources
 {
 	class AssetDatabase
@@ -19,15 +21,18 @@ namespace Resources
 
 	template<typename T> T* AssetDatabase::GetAsset(const std::string& filePath)
 	{
-		if (_assets.find(filePath) != AssetDatabase::_assets.end())
+		auto iterator = _assets.find(filePath);
+		Asset* asset;
+		if (iterator != AssetDatabase::_assets.end())
 		{
-			Asset* asset = _assets.at(filePath);
-			asset->IncreaseReferenceCount();
-			return (T*)asset;
+			asset = iterator->second;
 		}
-		T* asset = new T(filePath);
+		else
+		{
+			asset = new T(filePath);
+			_assets.insert(std::pair<std::string, Asset*>(filePath, asset));
+		}
 		asset->IncreaseReferenceCount();
-		_assets.insert(std::pair<std::string, Asset*>(filePath, asset));
-		return asset;
+		return (T*)asset;
 	}
 }

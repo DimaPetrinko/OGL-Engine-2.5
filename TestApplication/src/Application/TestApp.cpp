@@ -2,14 +2,9 @@
 
 namespace Application
 {
-	TestApp::TestApp(float windowWidth, float windowHeight) : _renderer(windowWidth, windowHeight),
-		_vb(_renderer.IsInitialized()), _ib(_renderer.IsInitialized()), _va(_renderer.IsInitialized())
+	TestApp::TestApp(float windowWidth, float windowHeight) : _renderer(windowWidth, windowHeight)
 	{
-		if (_renderer.IsInitialized()
-		&& InitializeGUI()
-		&& LoadAssets()
-		&& SetUpGraphicsObjects()
-		&& UnbindAll()) _running = true;
+		if (_renderer.IsInitialized()) _running = true;
 		else
 		{
 			printf("Could not initialize application\n");
@@ -19,9 +14,37 @@ namespace Application
 
 	TestApp::~TestApp()
 	{
+		delete _gameObject;
+		delete _gameObject2;
+
 		DeinitializeGUI();
-		if (_shader != nullptr) Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_shader);
-		if (_texture != nullptr) Resources::AssetDatabase::PutBack((Resources::Asset**)(void**)&_texture);
+	}
+
+	bool TestApp::LoadAssets()
+	{
+		// for each gameobject - load its dependencies
+		Rendering::Mesh* mesh;
+		Rendering::Shader* shader;
+		Rendering::Texture* texture;
+
+		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>("mesh");
+		shader = Resources::AssetDatabase::GetAsset<Rendering::Shader>
+			(WORKING_DIRECTORY "res/shaders/Basic.shader");
+		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
+			(WORKING_DIRECTORY "res/textures/checker3.jpg");
+		_gameObject = new Systems::GameObject(&_renderer, mesh, texture, 1, shader);
+
+		// to increment reference count
+		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>("mesh");
+		shader = Resources::AssetDatabase::GetAsset<Rendering::Shader>
+			(WORKING_DIRECTORY "res/shaders/Basic.shader");
+		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
+			(WORKING_DIRECTORY "res/textures/image.png");
+		_gameObject2 = new Systems::GameObject(&_renderer,mesh, texture, 2, shader);
+		_gameObject2->Transform.Position = {0.0f, 0.0f, -100.0f};
+		_gameObject2->Transform.Rotation = {0.0f, 45.0f, 0.0f};
+
+		return true;
 	}
 
 	bool TestApp::InitializeGUI()
@@ -50,21 +73,31 @@ namespace Application
 		ImGui_ImplGlfw_NewFrame();
 		NewFrame();
 
-		SetNextWindowPos(ImVec2(_renderer.WindowWidth(), 0.0f), ImGuiCond_Once, ImVec2(1.0f, 0.0f));
-		SetNextWindowSize(ImVec2(350.0f, _renderer.WindowHeight()), ImGuiCond_Once);
+		SetNextWindowPos(ImVec2(_renderer.WindowWidth(), 0.0f), 0, ImVec2(1.0f, 0.0f));
+		SetNextWindowSize(ImVec2(350.0f, _renderer.WindowHeight()));
 
 		if (Begin("Inspector", nullptr,
 		ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_NoResize
 		| ImGuiWindowFlags_NoMove))
-
 		{
-			ShowTransform("Model", false, &_modelPosition, &_modelRotation, &_modelScale);
+			ShowTransform("Model", false, &_gameObject->Transform.Position,
+				&_gameObject->Transform.Rotation, &_gameObject->Transform.Scale);
+			ShowTransform("Model 2", false, &_gameObject2->Transform.Position,
+				&_gameObject2->Transform.Rotation, &_gameObject2->Transform.Scale);
 
 			Separator();
 			Spacing();
 
-			ShowTransform("Camera", false, &_cameraPosition, &_cameraRotation);
+			ShowTransform("Camera", false, &_cameraTransform.Position, &_cameraTransform.Rotation);
+
+			SetNextItemOpen(true, ImGuiCond_Once);
+			if (TreeNode("Metrics"))
+			{
+				ImGuiIO& io = ImGui::GetIO();
+				ImGui::Text("Frame time %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+				TreePop();
+			}
 
 			End();
 		}
@@ -84,7 +117,7 @@ namespace Application
 		{
 			if (position != nullptr) SliderFloat3("Position", &position->x, -500.0f, 500.0f, "%.3f");
 			if (rotation != nullptr) SliderFloat3("Rotation", &rotation->x, -360.0f, 360.0f, "%.3f");
-			if (scale != nullptr) SliderFloat3("Scale", &scale->x, -5.0f, 5.0f, "%.3f");
+			if (scale != nullptr) SliderFloat3("Scale", &scale->x, 0.0f, 5.0f, "%.3f");
 			TreePop();
 		}
 	}
@@ -96,14 +129,10 @@ namespace Application
 
 	bool TestApp::UpdateLogic()
 	{
-		// static glm::vec3 step = glm::vec3(5.0f, 5.0f, 0.0f) / 4.0f;
-		// static glm::vec3 direction = step;
-		// if (_position.x > _renderer.WindowWidth()/3) direction.x = -step.x;
-		// else if (_position.x < 0) direction.x = step.x;
-		// if (_position.y > _renderer.WindowHeight()/3) direction.y = -step.y;
-		// else if (_position.y < 0) direction.y = step.y;
+		static const float deltaTime = 1.0f / 60.0f;
 
-		// _position += direction;
+		_gameObject->Transform.Rotation.y += deltaTime * 20.0f;
+		if (_gameObject->Transform.Rotation.y >= 360.0f) _gameObject->Transform.Rotation.y = 0.0f;
 
 		return true;
 	}
@@ -112,34 +141,12 @@ namespace Application
 	{
 		if (_renderer.IsWindowClosed()) return false;
 
-		glm::vec3 xAxis = glm::vec3(1.0f, 0.0f, 0.0f);
-		glm::vec3 yAxis = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 zAxis = glm::vec3(0.0f, 0.0f, 1.0f);
-
-		auto modelRadians = glm::radians(_modelRotation);
-		glm::mat4 modelMat(1.0f);
-		modelMat = glm::translate(modelMat, _modelPosition);
-		modelMat = glm::rotate(modelMat, modelRadians.x, xAxis);
-		modelMat = glm::rotate(modelMat, modelRadians.y, yAxis);
-		modelMat = glm::rotate(modelMat, modelRadians.z, zAxis);
-		modelMat = glm::scale(modelMat, _modelScale);
-
-		auto viewRadians = glm::radians(_cameraRotation);
-		glm::mat4 viewMat(1.0f);
-		viewMat = glm::rotate(viewMat, viewRadians.x, xAxis);
-		viewMat = glm::rotate(viewMat, viewRadians.y, yAxis);
-		viewMat = glm::rotate(viewMat, viewRadians.z, zAxis);
-		viewMat = glm::translate(viewMat, -_cameraPosition);
-
-		glm::mat4 mvp = _renderer.ProjectionMatrix() * viewMat * modelMat;
-
-		_shader->Bind();
-		_shader->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
-		_shader->SetUniformMatrix4fv("u_Mvp", &mvp[0][0]);
-		_shader->SetUniformMatrix4fv("u_M", &modelMat[0][0]);
-
 		_renderer.Clear();
-		_renderer.Draw(_ib, _va, _shader);
+		// move to Draw method of CameraRenderer
+		_renderer.ViewMatrix = _cameraTransform.GetInvertedTranslationMatrix();
+
+		_gameObject->Draw();
+		_gameObject2->Draw();
 
 		return true;
 	}
@@ -147,91 +154,6 @@ namespace Application
 	bool TestApp::FinishFrame()
 	{
 		_renderer.PostRender();
-		return true;
-	}
-
-	bool TestApp::LoadAssets()
-	{
-		_shader = Resources::AssetDatabase::GetAsset<Rendering::Shader>
-		(WORKING_DIRECTORY "res/shaders/Basic.shader");
-		_texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
-		(WORKING_DIRECTORY "res/textures/image.png");
-		return true;
-	}
-
-	struct Vertex
-	{
-		glm::vec3 _position;
-		glm::vec2 _texCoord;
-		glm::vec3 _normal;
-	};
-
-	// move to renderer?
-	void CalculateNormals(const unsigned int* indices, unsigned int indicesCount,
-		Vertex* vertices, unsigned int verticesCount)
-	{
-		for (unsigned int i = 0 ; i < indicesCount ; i += 3)
-		{
-			unsigned int i0 = indices[i];
-			unsigned int i1 = indices[i + 1];
-			unsigned int i2 = indices[i + 2];
-			glm::vec3 v1 = vertices[i1]._position - vertices[i0]._position;
-			glm::vec3 v2 = vertices[i2]._position - vertices[i0]._position;
-			glm::vec3 normal = glm::cross(v1, v2);
-			normal = glm::normalize(normal);
-
-			vertices[i0]._normal = normal;
-		}
-
-		for (unsigned int i = 0 ; i < verticesCount ; i++)
-		{
-			vertices[i]._normal = glm::normalize(vertices[i]._normal);
-		}
-	}
-
-	bool TestApp::SetUpGraphicsObjects()
-	{
-		unsigned int indicesCount = 4 * 3; // n triangles
-		unsigned int indices[] =
-		{
-			2, 0, 1,
-			3, 1, 0,
-			1, 3, 2,
-			0, 2, 3
-		};
-		_ib.SetData(&indices[0], indicesCount);
-
-		unsigned int verticesCount = 4;
-		Vertex vertices[] =
-		{
-			Vertex {glm::vec3(-50.0f, 0.0f,  0.0f),  glm::vec2(0.0f, 0.0f)},
-			Vertex {glm::vec3( 50.0f, 0.0f,  0.0f),  glm::vec2(1.0f, 0.0f)},
-			Vertex {glm::vec3( 0.0f,  50.0f, 0.0f),  glm::vec2(0.5f, 1.0f)},
-			Vertex {glm::vec3( 0.0f,  25.0f, 50.0f), glm::vec2(0.5f, 0.5f)}
-		};
-		CalculateNormals(indices, indicesCount, vertices, verticesCount);
-		_vb.SetData(&vertices[0], verticesCount * sizeof(Vertex));
-
-		Rendering::VertexBufferLayout layout;
-		layout.Push<float>(3);
-		layout.Push<float>(2);
-		layout.Push<float>(3);
-		_va.AddBuffer(_vb, layout);
-
-		int slot = 1;
-		_shader->Bind();
-		_texture->Bind(slot);
-		_shader->SetUniform1i("u_Texture", slot);
-
-		return true;
-	}
-
-	bool TestApp::UnbindAll()
-	{
-		_vb.Unbind();
-		_ib.Unbind();
-		_va.Unbind();
-		_shader->Unbind();
 		return true;
 	}
 }

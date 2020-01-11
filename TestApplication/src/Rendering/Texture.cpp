@@ -10,7 +10,7 @@ namespace Rendering
 		stbi_set_flip_vertically_on_load(1);
 		unsigned char* data = stbi_load(filePath.c_str(), &_width, &_height, &_BPP, 4);
 
-		if (!*data)
+		if (!data)
 		{
 			std::cout << "Could not load texture at " << filePath << std::endl;
 			return;
@@ -32,6 +32,7 @@ namespace Rendering
 
 	Texture::~Texture()
 	{
+		if (_rendererId == 0) return;
 		GLCall(glDeleteTextures(1, &_rendererId));
 	}
 

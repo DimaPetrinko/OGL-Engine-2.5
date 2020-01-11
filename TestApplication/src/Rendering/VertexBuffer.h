@@ -7,6 +7,7 @@ namespace Rendering
 	class VertexBuffer final : public GraphicsObject
 	{
 	public:
+		VertexBuffer() {};
 		VertexBuffer(const bool& glInitialized);
 		~VertexBuffer();
 

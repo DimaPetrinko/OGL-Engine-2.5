@@ -17,6 +17,21 @@ namespace Rendering
 		return true;
 	}
 
+	void FramebuferSizeCallback(GLFWwindow* window, int width, int height)
+	{
+		Renderer::Renderer::SetWindowWidthAndHeight(nullptr, width, height);
+	}
+
+	void Renderer::SetWindowWidthAndHeight(Renderer* instance, const int width, const int height)
+	{
+		static Renderer* renderer;
+		if (instance) renderer = instance;
+		renderer->_windowWidth = width;
+		renderer->_windowHeight = height;
+		renderer->UpdateProjectionMatrix();
+		GLCall(glViewport(0, 0, width - 350.0f, height));
+	}
+
 	bool Renderer::_isInitialized = false;
 
 	Renderer::Renderer(float windowWidth, float windowHeight) : _windowWidth(windowWidth),
@@ -32,14 +47,19 @@ namespace Rendering
 			std::cout << glewGetErrorString(error) << std::endl;
 			_isInitialized = false;
 		}
-		_projectionMatrix =
-			glm::perspectiveFov(20.0f, _windowWidth, _windowHeight, 0.0f, 100.0f);
-			// glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, -100.0f, 100.0f);
 		printf("GL version: %s\n", glGetString(GL_VERSION));
 
-		int display_w, display_h;
-		glfwGetFramebufferSize(_window, &display_w, &display_h);
-		GLCall(glViewport(0, 0, display_w, display_h));
+		UpdateProjectionMatrix();
+
+		glClearColor(0.05f, 0.05f, 0.15f, 1.0f);
+
+		glfwSetFramebufferSizeCallback(_window, &FramebuferSizeCallback);
+		int currentWidth, currentHeight;
+		glfwGetFramebufferSize(_window, &currentWidth, &currentHeight);
+		SetWindowWidthAndHeight(this, currentWidth, currentHeight);
+
+		GLCall(glEnable(GL_DEPTH_TEST));
+		GLCall(glDepthFunc(GL_LESS));
 
 		// GLCall(glEnable(GL_BLEND));
 		// GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -64,7 +84,7 @@ namespace Rendering
 
 	void Renderer::Clear() const
 	{
-		GLCall(glClear(GL_COLOR_BUFFER_BIT));
+		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	}
 
 	void Renderer::Draw(const IndexBuffer& ib, const VertexArray& va, const Shader* sh) const
@@ -84,6 +104,12 @@ namespace Rendering
 		glfwSwapBuffers(_window);
 	}
 
+	void Renderer::UpdateProjectionMatrix()
+	{
+		ProjectionMatrix = glm::perspectiveFov(20.0f, _windowWidth - 350.0f, _windowHeight, 0.01f, 1000.0f);
+			// glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, -100.0f, 100.0f);
+	}
+
 	bool Renderer::CreateWindow(GLFWwindow*& window, const char* title, int width, int height)
 	{
 		static bool glfwInitialized;
@@ -100,7 +126,7 @@ namespace Rendering
 			printf("Initialized GLFW. Version: %s\n", glfwGetVersionString());
 		}
 
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		// glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

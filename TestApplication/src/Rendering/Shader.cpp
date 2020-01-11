@@ -18,13 +18,18 @@ namespace Rendering
 		while (getline(stream, line)) ss << line << "\n";
 		std::string* data = new std::string(ss.str());
 
-		auto [vertexShaderSource, fragmentShaderSource] = ParseShader(data);
-		_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
-		delete data;
+		if (data)
+		{
+			auto [vertexShaderSource, fragmentShaderSource] = ParseShader(data);
+			_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
+			delete data;
+		}
+		stream.close();
 	}
 
 	Shader::~Shader()
 	{
+		if (_rendererId == 0) return;
 		GLCall(glDeleteProgram(_rendererId));
 	}
 
@@ -41,6 +46,11 @@ namespace Rendering
 	void Shader::SetUniform1i(const std::string& name, int value)
 	{
 		GLCall(glUniform1i(GetUniformLocation(name), value));
+	}
+
+	void Shader::SetUniform3f(const std::string& name, float v0, float v1, float v2)
+	{
+		GLCall(glUniform3f(GetUniformLocation(name), v0, v1, v2));
 	}
 
 	void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)

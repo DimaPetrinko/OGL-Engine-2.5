@@ -12,12 +12,15 @@ namespace Application
 	{
 	protected:
 		bool _running;
+		bool _warmedUp;
 	public:
-		App() : _running(true) {}
+		App() : _running(false), _warmedUp(false) {}
 		virtual ~App() = default;
+		void WarmUp();
 		void Run();
 
 	protected:
+		virtual bool LoadAssets() = 0;
 		virtual bool InitializeGUI() = 0;
 		virtual bool DeinitializeGUI() = 0;
 		virtual bool UpdateGUI() = 0;

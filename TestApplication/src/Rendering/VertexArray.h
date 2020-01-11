@@ -41,6 +41,7 @@ namespace Rendering
 	class VertexArray : public GraphicsObject
 	{
 	public:
+		VertexArray() {};
 		VertexArray(const bool& glInitialized);
 		~VertexArray();
 

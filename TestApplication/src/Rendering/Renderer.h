@@ -11,8 +11,10 @@ namespace Rendering
 {
 	class Renderer
 	{
+	public:
+		glm::mat4 ProjectionMatrix;
+		glm::mat4 ViewMatrix;
 	private:
-		glm::mat4 _projectionMatrix;
 		float _windowWidth;
 		float _windowHeight;
 		static bool _isInitialized;
@@ -22,15 +24,16 @@ namespace Rendering
 		~Renderer();
 
 		static bool IsInitialized() { return _isInitialized; }
+		static void SetWindowWidthAndHeight(Renderer* instance, const int width, const int height);
 		float WindowWidth() const { return _windowWidth; }
 		float WindowHeight() const { return _windowHeight; }
 		GLFWwindow* GetWindow() const { return _window; }
-		glm::mat4 ProjectionMatrix() const { return _projectionMatrix; }
 		bool IsWindowClosed() const;
 		void Clear() const;
 		void Draw(const IndexBuffer& ib, const VertexArray& va, const Shader* sh) const;
 		void PostRender() const;
 	private:
+		void UpdateProjectionMatrix();
 		bool CreateWindow(GLFWwindow*& window, const char* title, int width, int height);
 	};
 }
