@@ -23,16 +23,16 @@ namespace Systems
 
 	void GameObject::Draw() // to renderer component
 	{
-		glm::mat4 modelMat = Transform.GetMatrix();
-
-		glm::mat4 mvp = _renderer->ProjectionMatrix * _renderer->ViewMatrix * modelMat;
+		glm::mat4 m = Transform.GetMatrix();
+		glm::mat4 mvp = _renderer->ProjectionMatrix * _renderer->ViewMatrix * m;
 
 		_shader->Bind();
 		_texture->Bind(_textureSlot);
 		_shader->SetUniform1i("u_Texture", _textureSlot);
 		_shader->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+		_shader->SetUniform3f("u_LightDirection", 1.0f, 1.0f, 0.0f);
 		_shader->SetUniformMatrix4fv("u_Mvp", &mvp[0][0]);
-		_shader->SetUniformMatrix4fv("u_M", &modelMat[0][0]);
+		_shader->SetUniformMatrix4fv("u_Mv", &m[0][0]);
 
 		_renderer->Draw(*_mesh->GetIB(), *_mesh->GetVA(), _shader);
 	}

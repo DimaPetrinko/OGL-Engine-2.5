@@ -129,6 +129,11 @@ namespace Application
 
 	bool TestApp::UpdateLogic()
 	{
+		static const float deltaTime = 1.0f / 60.0f;
+
+		_gameObject->Transform.Rotation.y += deltaTime * 20.0f;
+		if (_gameObject->Transform.Rotation.y >= 360.0f) _gameObject->Transform.Rotation.y = 0.0f;
+
 		return true;
 	}
 

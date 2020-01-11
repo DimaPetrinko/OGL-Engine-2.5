@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include "AssetManagement/Asset.h"
 #include "Rendering/Vertex.h"
 #include "Rendering/Triangle.h"
@@ -14,6 +13,7 @@ namespace Rendering
 	class Mesh : public Resources::Asset
 	{
 	private:
+		std::string _name {""};
 		VertexBuffer _vb; // maybe move to renderer for batching?
 		IndexBuffer _ib;
 		VertexArray _va;
