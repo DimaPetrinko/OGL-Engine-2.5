@@ -32,7 +32,7 @@ namespace Systems
 		_shader->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
 		_shader->SetUniform3f("u_LightDirection", 1.0f, 1.0f, 0.0f);
 		_shader->SetUniformMatrix4fv("u_Mvp", &mvp[0][0]);
-		_shader->SetUniformMatrix4fv("u_Mv", &m[0][0]);
+		_shader->SetUniformMatrix4fv("u_M", &m[0][0]);
 
 		_renderer->Draw(*_mesh->GetIB(), *_mesh->GetVA(), _shader);
 	}
