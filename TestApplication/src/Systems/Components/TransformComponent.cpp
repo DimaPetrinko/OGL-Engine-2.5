@@ -19,7 +19,9 @@ namespace Systems::Components
 	{
 		auto radians = glm::radians(Rotation);
 		glm::mat4 transformation(1.0f);
-		transformation = transformation * GetRotationMatrix();
+		transformation = glm::rotate(transformation, radians.z, zAxis);
+		transformation = glm::rotate(transformation, radians.x, xAxis);
+		transformation = glm::rotate(transformation, radians.y, yAxis);
 		transformation = glm::translate(transformation, -Position);
 		return transformation;
 	}

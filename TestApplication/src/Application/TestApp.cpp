@@ -27,7 +27,8 @@ namespace Application
 		Rendering::Shader* shader;
 		Rendering::Texture* texture;
 
-		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>("mesh");
+		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>
+			(WORKING_DIRECTORY "res/models/MonkeyHead.obj");
 		shader = Resources::AssetDatabase::GetAsset<Rendering::Shader>
 			(WORKING_DIRECTORY "res/shaders/Basic.shader");
 		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
@@ -35,7 +36,8 @@ namespace Application
 		_gameObject = new Systems::GameObject(&_renderer, mesh, texture, 1, shader);
 
 		// to increment reference count
-		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>("mesh");
+		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>
+			(WORKING_DIRECTORY "res/models/cube.obj");
 		shader = Resources::AssetDatabase::GetAsset<Rendering::Shader>
 			(WORKING_DIRECTORY "res/shaders/Basic.shader");
 		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>

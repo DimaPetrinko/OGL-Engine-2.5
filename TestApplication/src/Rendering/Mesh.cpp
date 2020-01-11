@@ -1,4 +1,8 @@
 #include "Rendering/Mesh.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include "Utils/ObjParser.h"
 
 namespace Rendering
 {
@@ -10,66 +14,47 @@ namespace Rendering
 			unsigned int i0 = triangles[i].indices[0];
 			unsigned int i1 = triangles[i].indices[1];
 			unsigned int i2 = triangles[i].indices[2];
-			glm::vec3 v1 = vertices[i1]._position - vertices[i2]._position;
-			glm::vec3 v2 = vertices[i0]._position - vertices[i2]._position;
+			glm::vec3 v1 = vertices[i1].Position - vertices[i2].Position;
+			glm::vec3 v2 = vertices[i0].Position - vertices[i2].Position;
 			glm::vec3 normal = glm::cross(v1, v2);
 			normal = glm::normalize(normal);
 
-			vertices[i2]._normal = normal;
+			vertices[i2].Normal = normal;
 		}
 
 		for (unsigned int i = 0 ; i < verticesCount ; i++)
 		{
-			vertices[i]._normal = glm::normalize(vertices[i]._normal);
+			vertices[i].Normal = glm::normalize(vertices[i].Normal);
 		}
 	}
 
 	Mesh::Mesh(const std::string& filePath)
 	{
-		// load from file
-		// parse data into vertices and triangles
+		std::ifstream stream(filePath);
+		if (stream.fail()) printf("%s doesn't exist\n", filePath);
 
-		_name = filePath;
+		std::stringstream ss;
+		std::string line;
 
-		//Test
-		unsigned int trianglesCount = 12;
-		Triangle triangles[] =
-		{
-			{0, 3, 1}, // -z
-			{3, 2, 1},
-			{2, 3, 7}, // -x
-			{6, 2, 7},
-			{6, 7, 4}, // z
-			{5, 6, 4},
-			{5, 4, 0}, // x
-			{1, 5, 0},
-			{5, 1, 2}, // y
-			{6, 5, 2},
-			{0, 4, 3}, // -y
-			{4, 7, 3},
-		};
+		while (getline(stream, line)) ss << line << "\n";
+		std::string data = std::string(ss.str());
+		stream.close();
 
-		unsigned int verticesCount = 8;
-		Vertex vertices[] =
-		{
-			{glm::vec3(-50.0f, -50.0f, -50.0f), glm::vec2(1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)},
-			{glm::vec3(-50.0f,  50.0f, -50.0f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f)},
-			{glm::vec3( 50.0f,  50.0f, -50.0f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
-			{glm::vec3( 50.0f, -50.0f, -50.0f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)},
-			{glm::vec3(-50.0f, -50.0f,  50.0f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)},
-			{glm::vec3(-50.0f,  50.0f,  50.0f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)},
-			{glm::vec3( 50.0f,  50.0f,  50.0f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)},
-			{glm::vec3( 50.0f, -50.0f,  50.0f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f)}
-		};
+		Utils::ObjParser parser {};
+		parser.Parse(data);
+
+		std::cout << "Object: " << parser.Name << std::endl;
+		std::cout << "\tVerts: " << parser.Vertices.size() << std::endl;
+		std::cout << "\tTris: " << parser.Triangles.size() << std::endl;
+
+		_name = parser.Name;
 
 		new(&_ib) IndexBuffer(true);
 		new(&_vb) VertexBuffer(true);
 		new(&_va) VertexArray(true);
 
-		_ib.SetData(&triangles[0].indices[0], trianglesCount * 3);
-		//calculate normals?
-		CalculateNormals(triangles,trianglesCount, vertices, verticesCount);
-		_vb.SetData(&vertices[0], verticesCount * sizeof(Rendering::Vertex));
+		_ib.SetData(&parser.Triangles[0].indices[0], parser.Triangles.size() * 3);
+		_vb.SetData(&parser.Vertices[0], parser.Vertices.size() * sizeof(Rendering::Vertex));
 
 		Rendering::VertexBufferLayout layout;
 		layout.Push<float>(3);
@@ -80,6 +65,5 @@ namespace Rendering
 
 	Mesh::~Mesh()
 	{
-		// clean up
 	}
 }
