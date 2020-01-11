@@ -64,7 +64,7 @@ namespace Rendering
 		// GLCall(glEnable(GL_BLEND));
 		// GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-		GLCall(glFrontFace(GL_CW));
+		GLCall(glFrontFace(GL_CCW));
 		GLCall(glCullFace(GL_BACK));
 		GLCall(glEnable(GL_CULL_FACE));
 
