@@ -8,20 +8,20 @@ namespace Utils
 	class Timer
 	{
 	private:
-		std::chrono::time_point<std::chrono::_V2::high_resolution_clock> start, end;
-		std::chrono::duration<float> duration;
+		std::chrono::time_point<std::chrono::_V2::high_resolution_clock> mStart, mEnd;
+		std::chrono::duration<float> mDuration;
 	public:
 		Timer()
 		{
-			start = std::chrono::high_resolution_clock::now();
+			mStart = std::chrono::high_resolution_clock::now();
 		}
 
 		~Timer()
 		{
-			end = std::chrono::high_resolution_clock::now();
-			duration = end - start;
+			mEnd = std::chrono::high_resolution_clock::now();
+			mDuration = mEnd - mStart;
 
-			auto ms = duration.count() * 1000.0f;
+			auto ms = mDuration.count() * 1000.0f;
 			std::cout << ms << "ms" << std::endl;
 		}
 	};

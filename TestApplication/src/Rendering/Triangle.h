@@ -4,6 +4,6 @@ namespace Rendering
 {
 	struct Triangle
 	{
-		unsigned int indices[3];
+		unsigned int Indices[3];
 	};
 }

@@ -13,15 +13,15 @@ namespace Rendering
 	class Mesh : public Resources::Asset
 	{
 	private:
-		std::string _name {""};
-		VertexBuffer _vb; // maybe move to renderer for batching?
-		IndexBuffer _ib;
-		VertexArray _va;
+		std::string mName {""};
+		VertexBuffer mVb; // maybe move to renderer for batching?
+		IndexBuffer mIb;
+		VertexArray mVa;
 	public:
 		Mesh(const std::string& filePath);
 		~Mesh();
 
-		VertexArray* GetVA() { return &_va; }
-		IndexBuffer* GetIB() { return &_ib; }
+		VertexArray* GetVA() { return &mVa; }
+		IndexBuffer* GetIB() { return &mIb; }
 	};
 }

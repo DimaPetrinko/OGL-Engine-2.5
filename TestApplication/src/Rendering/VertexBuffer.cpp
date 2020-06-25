@@ -7,13 +7,13 @@ namespace Rendering
 	VertexBuffer::VertexBuffer(const bool& glInitialized)
 	{
 		if (!glInitialized) return;
-		GLCall(glGenBuffers(1, &_rendererId));
+		GLCall(glGenBuffers(1, &mRendererId));
 	}
 
 	VertexBuffer::~VertexBuffer()
 	{
-		if (_rendererId == 0) return;
-		GLCall(glDeleteBuffers(1, &_rendererId));
+		if (mRendererId == 0) return;
+		GLCall(glDeleteBuffers(1, &mRendererId));
 	}
 
 	void VertexBuffer::SetData(const void* data, const unsigned int size)
@@ -26,7 +26,7 @@ namespace Rendering
 
 	void VertexBuffer::Bind() const
 	{
-		GLCall(glBindBuffer(GL_ARRAY_BUFFER, _rendererId));
+		GLCall(glBindBuffer(GL_ARRAY_BUFFER, mRendererId));
 	}
 
 	void VertexBuffer::Unbind() const

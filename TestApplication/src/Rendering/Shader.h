@@ -10,7 +10,7 @@ namespace Rendering
 	class Shader : public GraphicsObject, public Resources::Asset
 	{
 	private:
-		std::unordered_map<std::string, int> _uniformLocations;
+		std::unordered_map<std::string, int> mUniformLocations;
 
 	public:
 		Shader(const std::string& filePath);

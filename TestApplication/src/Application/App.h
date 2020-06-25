@@ -11,10 +11,11 @@ namespace Application
 	class App
 	{
 	protected:
-		bool _running;
-		bool _warmedUp;
+		uint8_t mReturnCode;
+		bool mRunning;
+		bool mWarmedUp;
 	public:
-		App() : _running(false), _warmedUp(false) {}
+		App() : mRunning(false), mWarmedUp(false) {}
 		virtual ~App() = default;
 		void WarmUp();
 		void Run();

@@ -8,7 +8,7 @@ namespace Rendering
 	Texture::Texture(const std::string& filePath)
 	{
 		stbi_set_flip_vertically_on_load(1);
-		unsigned char* data = stbi_load(filePath.c_str(), &_width, &_height, &_BPP, 4);
+		unsigned char* data = stbi_load(filePath.c_str(), &mWidth, &mHeight, &mBPP, 4);
 
 		if (!data)
 		{
@@ -17,14 +17,14 @@ namespace Rendering
 		}
 
 
-		GLCall(glGenTextures(1, &_rendererId));
+		GLCall(glGenTextures(1, &mRendererId));
 
 		Bind();
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
 		Unbind();
 
 		stbi_image_free(data);
@@ -32,13 +32,13 @@ namespace Rendering
 
 	Texture::~Texture()
 	{
-		if (_rendererId == 0) return;
-		GLCall(glDeleteTextures(1, &_rendererId));
+		if (mRendererId == 0) return;
+		GLCall(glDeleteTextures(1, &mRendererId));
 	}
 
 	void Texture::Bind() const
 	{
-		GLCall(glBindTexture(GL_TEXTURE_2D, _rendererId));
+		GLCall(glBindTexture(GL_TEXTURE_2D, mRendererId));
 	}
 
 	void Texture::Bind(const unsigned int& slot) const

@@ -6,19 +6,19 @@ namespace Rendering
 	IndexBuffer::IndexBuffer(const bool& glInitialized)
 	{
 		if (!glInitialized) return;
-		GLCall(glGenBuffers(1, &_rendererId));
+		GLCall(glGenBuffers(1, &mRendererId));
 	}
 
 	IndexBuffer::~IndexBuffer()
 	{
-		if (_rendererId == 0) return;
-		GLCall(glDeleteBuffers(1, &_rendererId));
+		if (mRendererId == 0) return;
+		GLCall(glDeleteBuffers(1, &mRendererId));
 	}
 
 	void IndexBuffer::SetData(const unsigned int* data, const unsigned int count)
 	{
 		Bind();
-		this->count = count;
+		this->mCount = count;
 		GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_DYNAMIC_DRAW));
 		// glBufferData(GL_ARRAY_BUFFER, size of data we're pushing, the data itself, can be static, dynamic.. see documentation);
 		Unbind();
@@ -26,7 +26,7 @@ namespace Rendering
 
 	void IndexBuffer::Bind() const
 	{
-		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _rendererId));
+		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mRendererId));
 	}
 
 	void IndexBuffer::Unbind() const

@@ -17,11 +17,11 @@ namespace Application
 	{
 	private:
 
-		Rendering::Renderer _renderer;
+		Rendering::Renderer mRenderer;
 
-		Systems::GameObject* _gameObject;
-		Systems::GameObject* _gameObject2;
-		Systems::Components::TransformComponent _cameraTransform
+		Systems::GameObject* mGameObject;
+		Systems::GameObject* mGameObject2;
+		Systems::Components::TransformComponent mCameraTransform
 		{
 			glm::vec3(75.0f, 125.0f, 150.0f),
 			glm::vec3(30.0f, -30.0f, 0.0f),

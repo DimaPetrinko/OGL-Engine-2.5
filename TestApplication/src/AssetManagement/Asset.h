@@ -5,12 +5,12 @@ namespace Resources
 	class Asset
 	{
 	protected:
-		int _referenceCount = 0;
+		int mReferenceCount = 0;
 	public:
 		virtual ~Asset() = default;
 
-		void IncreaseReferenceCount() { ++_referenceCount; }
-		void DecreaseReferenceCount() { if (--_referenceCount < 0) _referenceCount = 0; }
-		int GetReferenceCount() const { return _referenceCount; }
+		void IncreaseReferenceCount() { ++mReferenceCount; }
+		void DecreaseReferenceCount() { if (--mReferenceCount < 0) mReferenceCount = 0; }
+		int GetReferenceCount() const { return mReferenceCount; }
 	};
 }

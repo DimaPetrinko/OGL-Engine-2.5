@@ -4,23 +4,23 @@ namespace Application
 {
 	void App::WarmUp()
 	{
-		_warmedUp = _warmedUp || InitializeGUI();
-		_warmedUp = _warmedUp && LoadAssets();
-		_running = _warmedUp;
+		mWarmedUp = mWarmedUp || InitializeGUI();
+		mWarmedUp = mWarmedUp && LoadAssets();
+		mRunning = mWarmedUp;
 	}
 
 	void App::Run()
 	{
-		if (!_warmedUp) WarmUp();
-		if (!_running) return;
+		if (!mWarmedUp) WarmUp();
+		if (!mRunning) return;
 
-		while (_running)
+		while (mRunning)
 		{
-			_running = _running && UpdateInput();
-			_running = _running && UpdateLogic();
-			_running = _running && UpdateScreen();
-			_running = _running && UpdateGUI();
-			_running = _running && FinishFrame();
+			mRunning = mRunning && UpdateInput();
+			mRunning = mRunning && UpdateLogic();
+			mRunning = mRunning && UpdateScreen();
+			mRunning = mRunning && UpdateGUI();
+			mRunning = mRunning && FinishFrame();
 		}
 		return;
 	}

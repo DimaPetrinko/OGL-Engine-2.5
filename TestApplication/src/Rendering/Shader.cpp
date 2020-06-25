@@ -21,7 +21,7 @@ namespace Rendering
 		if (data)
 		{
 			auto [vertexShaderSource, fragmentShaderSource] = ParseShader(data);
-			_rendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
+			mRendererId = CreateShader(vertexShaderSource, fragmentShaderSource);
 			delete data;
 		}
 		stream.close();
@@ -29,13 +29,13 @@ namespace Rendering
 
 	Shader::~Shader()
 	{
-		if (_rendererId == 0) return;
-		GLCall(glDeleteProgram(_rendererId));
+		if (mRendererId == 0) return;
+		GLCall(glDeleteProgram(mRendererId));
 	}
 
 	void Shader::Bind() const
 	{
-		GLCall(glUseProgram(_rendererId));
+		GLCall(glUseProgram(mRendererId));
 	}
 
 	void Shader::Unbind() const
@@ -65,11 +65,11 @@ namespace Rendering
 
 	int Shader::GetUniformLocation(const std::string& name)
 	{
-		if (_uniformLocations.find(name) != _uniformLocations.end()) return _uniformLocations[name];
+		if (mUniformLocations.find(name) != mUniformLocations.end()) return mUniformLocations[name];
 
-		GLCall(int location = glGetUniformLocation(_rendererId, name.c_str()));
+		GLCall(int location = glGetUniformLocation(mRendererId, name.c_str()));
 		if (location == -1) std::cout << "Uniform " << name << " doesn't exist\n";
-		_uniformLocations[name] = location;
+		mUniformLocations[name] = location;
 		return location;
 	}
 
