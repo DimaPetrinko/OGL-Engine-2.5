@@ -10,7 +10,7 @@ namespace Resources
 	class AssetDatabase
 	{
 	private:
-		static std::unordered_map<std::string, Asset*> _assets;
+		static std::unordered_map<std::string, Asset*> mAssets;
 	public:
 		template<typename T> static T* GetAsset(const std::string& filePath);
 
@@ -21,16 +21,16 @@ namespace Resources
 
 	template<typename T> T* AssetDatabase::GetAsset(const std::string& filePath)
 	{
-		auto iterator = _assets.find(filePath);
+		auto iterator = mAssets.find(filePath);
 		Asset* asset;
-		if (iterator != AssetDatabase::_assets.end())
+		if (iterator != AssetDatabase::mAssets.end())
 		{
 			asset = iterator->second;
 		}
 		else
 		{
 			asset = new T(filePath);
-			_assets.insert(std::pair<std::string, Asset*>(filePath, asset));
+			mAssets.insert(std::pair<std::string, Asset*>(filePath, asset));
 		}
 		asset->IncreaseReferenceCount();
 		return (T*)asset;

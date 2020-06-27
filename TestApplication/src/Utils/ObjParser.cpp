@@ -40,9 +40,9 @@ namespace Utils
 			else if (splitLine[0] == "f")
 			{
 				Rendering::Triangle t{};
-				ExtractFaceVertex(splitLine[1], positions, textures, normals, Vertices, &t.indices[0]);
-				ExtractFaceVertex(splitLine[2], positions, textures, normals, Vertices, &t.indices[1]);
-				ExtractFaceVertex(splitLine[3], positions, textures, normals, Vertices, &t.indices[2]);
+				ExtractFaceVertex(splitLine[1], positions, textures, normals, Vertices, &t.Indices[0]);
+				ExtractFaceVertex(splitLine[2], positions, textures, normals, Vertices, &t.Indices[1]);
+				ExtractFaceVertex(splitLine[3], positions, textures, normals, Vertices, &t.Indices[2]);
 				Triangles.push_back(t);
 			}
 			else continue;

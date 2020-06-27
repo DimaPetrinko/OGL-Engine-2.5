@@ -10,7 +10,7 @@ namespace Rendering
 	class Texture : public GraphicsObject, public Resources::Asset
 	{
 	private:
-		int _width, _height, _BPP;
+		int mWidth, mHeight, mBPP;
 	public:
 		Texture(const std::string& filePath);
 		~Texture();

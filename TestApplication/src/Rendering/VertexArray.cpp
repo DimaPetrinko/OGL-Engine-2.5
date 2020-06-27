@@ -5,18 +5,18 @@ namespace Rendering
 	VertexArray::VertexArray(const bool& glInitialized)
 	{
 		if (!glInitialized) return;
-		GLCall(glGenVertexArrays(1, &_rendererId));
+		GLCall(glGenVertexArrays(1, &mRendererId));
 	}
 
 	VertexArray::~VertexArray()
 	{
-		if (_rendererId == 0) return;
-		GLCall(glDeleteVertexArrays(1, &_rendererId));
+		if (mRendererId == 0) return;
+		GLCall(glDeleteVertexArrays(1, &mRendererId));
 	}
 
 	void VertexArray::Bind() const
 	{
-		GLCall(glBindVertexArray(_rendererId));
+		GLCall(glBindVertexArray(mRendererId));
 	}
 
 	void VertexArray::Unbind() const
@@ -34,9 +34,9 @@ namespace Rendering
 		{
 			const auto& element = elements[i];
 			GLCall(glEnableVertexAttribArray(i));
-			GLCall(glVertexAttribPointer(i, element.count/*per object*/, element.type, element.normalized,
+			GLCall(glVertexAttribPointer(i, element.Count/*per object*/, element.Type, element.Normalized,
 				layout.GetStride(), (const void*)offset));
-			offset += element.count/*total*/ * VertexBufferElement::GetSizeOfType(element.type);
+			offset += element.Count/*total*/ * VertexBufferElement::GetSizeOfType(element.Type);
 		}
 		vb.Unbind();
 		// glVertexAttribPointer(attribute index, elements count, GL_FLOAT, normalize (for 0 .. 255 byte or smth),
@@ -51,8 +51,8 @@ namespace Rendering
 	template<>
 	void VertexBufferLayout::Push<float>(const unsigned int& count/*, countPerAttribute*/)
 	{
-		elements.push_back({ GL_FLOAT, count, GL_FALSE });
-		stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
+		mElements.push_back({ GL_FLOAT, count, GL_FALSE });
+		mStride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
 		// include in buffer element
 		// stride += countPerAttribute * VertexBufferElement::GetSizeOfType(GL_FLOAT);
 	}
@@ -60,14 +60,14 @@ namespace Rendering
 	template<>
 	void VertexBufferLayout::Push<unsigned int>(const unsigned int& count)
 	{
-		elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE });
-		stride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_INT);
+		mElements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE });
+		mStride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_INT);
 	}
 
 	template<>
 	void VertexBufferLayout::Push<unsigned char>(const unsigned int& count)
 	{
-		elements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE });
-		stride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
+		mElements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE });
+		mStride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
 	}
 }

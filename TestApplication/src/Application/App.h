@@ -1,5 +1,8 @@
 #pragma once
 
+#include <iostream>
+#include "ExitCodes.h"
+
 #ifdef PLATFORM_WIN64
 #define WORKING_DIRECTORY ""
 #elif PLATFORM_LINUX64
@@ -11,22 +14,21 @@ namespace Application
 	class App
 	{
 	protected:
-		bool _running;
-		bool _warmedUp;
+		uint8_t mExitCode;
 	public:
-		App() : _running(false), _warmedUp(false) {}
+		App() : mExitCode(EXIT_CODE_NOT_INITIALIZED) {}
 		virtual ~App() = default;
 		void WarmUp();
-		void Run();
+		uint8_t Run();
 
 	protected:
-		virtual bool LoadAssets() = 0;
-		virtual bool InitializeGUI() = 0;
-		virtual bool DeinitializeGUI() = 0;
-		virtual bool UpdateGUI() = 0;
-		virtual bool UpdateInput() = 0;
-		virtual bool UpdateLogic() = 0;
-		virtual bool UpdateScreen() = 0;
-		virtual bool FinishFrame() = 0;
+		virtual void LoadAssets() = 0;
+		virtual void InitializeGUI() = 0;
+		virtual void DeinitializeGUI() = 0;
+		virtual void UpdateGUI() = 0;
+		virtual void UpdateInput() = 0;
+		virtual void UpdateLogic() = 0;
+		virtual void UpdateScreen() = 0;
+		virtual void FinishFrame() = 0;
 	};
 }

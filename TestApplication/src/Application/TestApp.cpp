@@ -2,25 +2,24 @@
 
 namespace Application
 {
-	TestApp::TestApp(float windowWidth, float windowHeight) : _renderer(windowWidth, windowHeight)
+	TestApp::TestApp(float windowWidth, float windowHeight) : mRenderer(windowWidth, windowHeight)
 	{
-		if (_renderer.IsInitialized()) _running = true;
-		else
+		if (!mRenderer.IsInitialized())
 		{
 			printf("Could not initialize application\n");
-			_running = false;
+			mExitCode = EXIT_CODE_NOT_INITIALIZED;
 		}
 	}
 
 	TestApp::~TestApp()
 	{
-		delete _gameObject;
-		delete _gameObject2;
+		delete mGameObject;
+		delete mGameObject2;
 
 		DeinitializeGUI();
 	}
 
-	bool TestApp::LoadAssets()
+	void TestApp::LoadAssets()
 	{
 		// for each gameobject - load its dependencies
 		Rendering::Mesh* mesh;
@@ -33,7 +32,7 @@ namespace Application
 			(WORKING_DIRECTORY "res/shaders/Basic.shader");
 		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
 			(WORKING_DIRECTORY "res/textures/checker3.jpg");
-		_gameObject = new Systems::GameObject(&_renderer, mesh, texture, 1, shader);
+		mGameObject = new Systems::GameObject(&mRenderer, mesh, texture, 1, shader);
 
 		// to increment reference count
 		mesh = Resources::AssetDatabase::GetAsset<Rendering::Mesh>
@@ -42,56 +41,51 @@ namespace Application
 			(WORKING_DIRECTORY "res/shaders/Basic.shader");
 		texture = Resources::AssetDatabase::GetAsset<Rendering::Texture>
 			(WORKING_DIRECTORY "res/textures/image.png");
-		_gameObject2 = new Systems::GameObject(&_renderer,mesh, texture, 2, shader);
-		_gameObject2->Transform.Position = {0.0f, 0.0f, -100.0f};
-		_gameObject2->Transform.Rotation = {0.0f, 45.0f, 0.0f};
-
-		return true;
+		mGameObject2 = new Systems::GameObject(&mRenderer,mesh, texture, 2, shader);
+		mGameObject2->Transform.Position = {0.0f, 0.0f, -100.0f};
+		mGameObject2->Transform.Rotation = {0.0f, 45.0f, 0.0f};
 	}
 
-	bool TestApp::InitializeGUI()
+	void TestApp::InitializeGUI()
 	{
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
-		ImGui_ImplGlfw_InitForOpenGL(_renderer.GetWindow(), true);
+		ImGui_ImplGlfw_InitForOpenGL(mRenderer.GetWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 330");
-
-		return true;
 	}
 
-	bool TestApp::DeinitializeGUI()
+	void TestApp::DeinitializeGUI()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
-		return true;
 	}
 
-	bool TestApp::UpdateGUI()
+	void TestApp::UpdateGUI()
 	{
 		using namespace ImGui;
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		NewFrame();
 
-		SetNextWindowPos(ImVec2(_renderer.WindowWidth(), 0.0f), 0, ImVec2(1.0f, 0.0f));
-		SetNextWindowSize(ImVec2(350.0f, _renderer.WindowHeight()));
+		SetNextWindowPos(ImVec2(mRenderer.WindowWidth(), 0.0f), 0, ImVec2(1.0f, 0.0f));
+		SetNextWindowSize(ImVec2(350.0f, mRenderer.WindowHeight()));
 
 		if (Begin("Inspector", nullptr,
 		ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_NoResize
 		| ImGuiWindowFlags_NoMove))
 		{
-			ShowTransform("Model", false, &_gameObject->Transform.Position,
-				&_gameObject->Transform.Rotation, &_gameObject->Transform.Scale);
-			ShowTransform("Model 2", false, &_gameObject2->Transform.Position,
-				&_gameObject2->Transform.Rotation, &_gameObject2->Transform.Scale);
+			ShowTransform("Model", false, &mGameObject->Transform.Position,
+				&mGameObject->Transform.Rotation, &mGameObject->Transform.Scale);
+			ShowTransform("Model 2", false, &mGameObject2->Transform.Position,
+				&mGameObject2->Transform.Rotation, &mGameObject2->Transform.Scale);
 
 			Separator();
 			Spacing();
 
-			ShowTransform("Camera", false, &_cameraTransform.Position, &_cameraTransform.Rotation);
+			ShowTransform("Camera", false, &mCameraTransform.Position, &mCameraTransform.Rotation);
 
 			SetNextItemOpen(true, ImGuiCond_Once);
 			if (TreeNode("Metrics"))
@@ -106,8 +100,6 @@ namespace Application
 
 		Render();
 		ImGui_ImplOpenGL3_RenderDrawData(GetDrawData());
-
-		return true;
 	}
 
 	void TestApp::ShowTransform(const char* title, const bool collapsed, glm::vec3* position,
@@ -124,38 +116,36 @@ namespace Application
 		}
 	}
 
-	bool TestApp::UpdateInput()
+	void TestApp::UpdateInput()
 	{
-		return true;
 	}
 
-	bool TestApp::UpdateLogic()
+	void TestApp::UpdateLogic()
 	{
 		static const float deltaTime = 1.0f / 60.0f;
 
-		_gameObject->Transform.Rotation.y += deltaTime * 20.0f;
-		if (_gameObject->Transform.Rotation.y >= 360.0f) _gameObject->Transform.Rotation.y = 0.0f;
-
-		return true;
+		mGameObject->Transform.Rotation.y += deltaTime * 20.0f;
+		if (mGameObject->Transform.Rotation.y >= 360.0f) mGameObject->Transform.Rotation.y = 0.0f;
 	}
 
-	bool TestApp::UpdateScreen()
+	void TestApp::UpdateScreen()
 	{
-		if (_renderer.IsWindowClosed()) return false;
+		if (mRenderer.IsWindowClosed())
+		{
+			mExitCode = EXIT_CODE_NORMAL;
+			return;
+		}
 
-		_renderer.Clear();
+		mRenderer.Clear();
 		// move to Draw method of CameraRenderer
-		_renderer.ViewMatrix = _cameraTransform.GetInvertedTranslationMatrix();
+		mRenderer.ViewMatrix = mCameraTransform.GetInvertedTranslationMatrix();
 
-		_gameObject->Draw();
-		_gameObject2->Draw();
-
-		return true;
+		mGameObject->Draw();
+		mGameObject2->Draw();
 	}
 
-	bool TestApp::FinishFrame()
+	void TestApp::FinishFrame()
 	{
-		_renderer.PostRender();
-		return true;
+		mRenderer.PostRender();
 	}
 }

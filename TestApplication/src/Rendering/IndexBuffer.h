@@ -7,7 +7,7 @@ namespace Rendering
 	class IndexBuffer final : public GraphicsObject
 	{
 	private:
-		unsigned int count{};
+		unsigned int mCount{};
 	public:
 		IndexBuffer() {};
 		IndexBuffer(const bool& glInitialized);
@@ -17,6 +17,6 @@ namespace Rendering
 		void Bind() const override;
 		void Unbind() const override;
 
-		inline unsigned int GetCount() const { return count; }
+		inline unsigned int GetCount() const { return mCount; }
 	};
 }

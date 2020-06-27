@@ -9,9 +9,9 @@ namespace Rendering
 {
 	struct VertexBufferElement
 	{
-		unsigned int type;
-		unsigned int count;
-		unsigned char normalized;
+		unsigned int Type;
+		unsigned int Count;
+		unsigned char Normalized;
 
 		static unsigned int GetSizeOfType(unsigned int type)
 		{
@@ -28,14 +28,14 @@ namespace Rendering
 	class VertexBufferLayout
 	{
 	private:
-		std::vector<VertexBufferElement> elements;
-		unsigned int stride{};
+		std::vector<VertexBufferElement> mElements;
+		unsigned int mStride{};
 	public:
 		template <typename T>
 		void Push(const unsigned int& count);
 
-		inline const std::vector<VertexBufferElement>& GetElements() const { return elements; }
-		inline unsigned int GetStride() const { return stride; }
+		inline const std::vector<VertexBufferElement>& GetElements() const { return mElements; }
+		inline unsigned int GetStride() const { return mStride; }
 	};
 
 	class VertexArray : public GraphicsObject

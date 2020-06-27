@@ -17,12 +17,12 @@ namespace Systems
 	public:
 		Components::TransformComponent Transform;
 	private:
-		const Rendering::Renderer* _renderer;
+		const Rendering::Renderer* mRenderer;
 
-		Rendering::Mesh* _mesh = nullptr;
-		Rendering::Texture* _texture = nullptr;
+		Rendering::Mesh* mMesh = nullptr;
+		Rendering::Texture* mTexture = nullptr;
 		Rendering::Shader* _shader = nullptr;
-		unsigned int _textureSlot;
+		unsigned int mTextureSlot;
 	public:
 		GameObject(const Rendering::Renderer* renderer, Rendering::Mesh* mesh,
 			Rendering::Texture* texture, unsigned int textureSlot, Rendering::Shader* shader);

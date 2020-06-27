@@ -26,26 +26,26 @@ namespace Rendering
 	{
 		static Renderer* renderer;
 		if (instance) renderer = instance;
-		renderer->_windowWidth = width;
-		renderer->_windowHeight = height;
+		renderer->mWindowWidth = width;
+		renderer->mWindowHeight = height;
 		renderer->UpdateProjectionMatrix();
 		GLCall(glViewport(0, 0, width - 350.0f, height));
 	}
 
-	bool Renderer::_isInitialized = false;
+	bool Renderer::mIsInitialized = false;
 
-	Renderer::Renderer(float windowWidth, float windowHeight) : _windowWidth(windowWidth),
-		 _windowHeight(windowHeight), _window(nullptr)
+	Renderer::Renderer(float windowWidth, float windowHeight) : mWindowWidth(windowWidth),
+		 mWindowHeight(windowHeight), mWindow(nullptr)
 	{
-		if (!CreateWindow(_window, "OGL-Engine-2.5", _windowWidth, _windowHeight))
+		if (!CreateWindow(mWindow, "OGL-Engine-2.5", mWindowWidth, mWindowHeight))
 		{
-			_isInitialized = false;
+			mIsInitialized = false;
 		}
 		auto error = glewInit();
 		if (error != GLEW_OK)
 		{
 			std::cout << glewGetErrorString(error) << std::endl;
-			_isInitialized = false;
+			mIsInitialized = false;
 		}
 		printf("GL version: %s\n", glGetString(GL_VERSION));
 
@@ -53,9 +53,9 @@ namespace Rendering
 
 		glClearColor(0.05f, 0.05f, 0.15f, 1.0f);
 
-		glfwSetFramebufferSizeCallback(_window, &FramebuferSizeCallback);
+		glfwSetFramebufferSizeCallback(mWindow, &FramebuferSizeCallback);
 		int currentWidth, currentHeight;
-		glfwGetFramebufferSize(_window, &currentWidth, &currentHeight);
+		glfwGetFramebufferSize(mWindow, &currentWidth, &currentHeight);
 		SetWindowWidthAndHeight(this, currentWidth, currentHeight);
 
 		GLCall(glEnable(GL_DEPTH_TEST));
@@ -68,18 +68,18 @@ namespace Rendering
 		GLCall(glCullFace(GL_BACK));
 		GLCall(glEnable(GL_CULL_FACE));
 
-		_isInitialized = true;
+		mIsInitialized = true;
 	}
 
 	Renderer::~Renderer()
 	{
-		glfwDestroyWindow(_window);
+		glfwDestroyWindow(mWindow);
 		glfwTerminate();
 	}
 
 	bool Renderer::IsWindowClosed() const
 	{
-		return glfwWindowShouldClose(_window);
+		return glfwWindowShouldClose(mWindow);
 	}
 
 	void Renderer::Clear() const
@@ -101,12 +101,12 @@ namespace Rendering
 	void Renderer::PostRender() const
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(_window);
+		glfwSwapBuffers(mWindow);
 	}
 
 	void Renderer::UpdateProjectionMatrix()
 	{
-		ProjectionMatrix = glm::perspectiveFov(20.0f, _windowWidth - 350.0f, _windowHeight, 0.01f, 1000.0f);
+		ProjectionMatrix = glm::perspectiveFov(20.0f, mWindowWidth - 350.0f, mWindowHeight, 0.01f, 1000.0f);
 			// glm::ortho(0.0f, _windowWidth, 0.0f, _windowHeight, -100.0f, 100.0f);
 	}
 
