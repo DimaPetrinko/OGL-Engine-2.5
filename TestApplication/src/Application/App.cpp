@@ -4,24 +4,24 @@ namespace Application
 {
 	void App::WarmUp()
 	{
-		mWarmedUp = mWarmedUp || InitializeGUI();
-		mWarmedUp = mWarmedUp && LoadAssets();
-		mRunning = mWarmedUp;
+		CallAndReturnCustom(InitializeGUI(), mExitCode, EXIT_CODE_NOT_INITIALIZED);
+		CallAndReturnCustom(LoadAssets(), mExitCode, EXIT_CODE_NOT_INITIALIZED);
+		mExitCode = EXIT_CODE_RUNNING;
 	}
 
-	void App::Run()
+	uint8_t App::Run()
 	{
-		if (!mWarmedUp) WarmUp();
-		if (!mRunning) return;
+		if (mExitCode == EXIT_CODE_NOT_INITIALIZED) WarmUp();
+		if (mExitCode != EXIT_CODE_RUNNING) return mExitCode;
 
-		while (mRunning)
+		while (mExitCode == EXIT_CODE_RUNNING)
 		{
-			mRunning = mRunning && UpdateInput();
-			mRunning = mRunning && UpdateLogic();
-			mRunning = mRunning && UpdateScreen();
-			mRunning = mRunning && UpdateGUI();
-			mRunning = mRunning && FinishFrame();
+			CallAndBreak(UpdateInput(), mExitCode);
+			CallAndBreak(UpdateLogic(), mExitCode);
+			CallAndBreak(UpdateScreen(), mExitCode);
+			CallAndBreak(UpdateGUI(), mExitCode);
+			CallAndBreak(FinishFrame(), mExitCode);
 		}
-		return;
+		return mExitCode;
 	}
 }

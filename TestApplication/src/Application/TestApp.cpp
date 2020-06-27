@@ -4,11 +4,10 @@ namespace Application
 {
 	TestApp::TestApp(float windowWidth, float windowHeight) : mRenderer(windowWidth, windowHeight)
 	{
-		if (mRenderer.IsInitialized()) mRunning = true;
-		else
+		if (!mRenderer.IsInitialized())
 		{
 			printf("Could not initialize application\n");
-			mRunning = false;
+			mExitCode = EXIT_CODE_NOT_INITIALIZED;
 		}
 	}
 
@@ -20,7 +19,7 @@ namespace Application
 		DeinitializeGUI();
 	}
 
-	bool TestApp::LoadAssets()
+	void TestApp::LoadAssets()
 	{
 		// for each gameobject - load its dependencies
 		Rendering::Mesh* mesh;
@@ -45,30 +44,25 @@ namespace Application
 		mGameObject2 = new Systems::GameObject(&mRenderer,mesh, texture, 2, shader);
 		mGameObject2->Transform.Position = {0.0f, 0.0f, -100.0f};
 		mGameObject2->Transform.Rotation = {0.0f, 45.0f, 0.0f};
-
-		return true;
 	}
 
-	bool TestApp::InitializeGUI()
+	void TestApp::InitializeGUI()
 	{
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
 		ImGui_ImplGlfw_InitForOpenGL(mRenderer.GetWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 330");
-
-		return true;
 	}
 
-	bool TestApp::DeinitializeGUI()
+	void TestApp::DeinitializeGUI()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
-		return true;
 	}
 
-	bool TestApp::UpdateGUI()
+	void TestApp::UpdateGUI()
 	{
 		using namespace ImGui;
 		ImGui_ImplOpenGL3_NewFrame();
@@ -106,8 +100,6 @@ namespace Application
 
 		Render();
 		ImGui_ImplOpenGL3_RenderDrawData(GetDrawData());
-
-		return true;
 	}
 
 	void TestApp::ShowTransform(const char* title, const bool collapsed, glm::vec3* position,
@@ -124,24 +116,25 @@ namespace Application
 		}
 	}
 
-	bool TestApp::UpdateInput()
+	void TestApp::UpdateInput()
 	{
-		return true;
 	}
 
-	bool TestApp::UpdateLogic()
+	void TestApp::UpdateLogic()
 	{
 		static const float deltaTime = 1.0f / 60.0f;
 
 		mGameObject->Transform.Rotation.y += deltaTime * 20.0f;
 		if (mGameObject->Transform.Rotation.y >= 360.0f) mGameObject->Transform.Rotation.y = 0.0f;
-
-		return true;
 	}
 
-	bool TestApp::UpdateScreen()
+	void TestApp::UpdateScreen()
 	{
-		if (mRenderer.IsWindowClosed()) return false;
+		if (mRenderer.IsWindowClosed())
+		{
+			mExitCode = EXIT_CODE_NORMAL;
+			return;
+		}
 
 		mRenderer.Clear();
 		// move to Draw method of CameraRenderer
@@ -149,13 +142,10 @@ namespace Application
 
 		mGameObject->Draw();
 		mGameObject2->Draw();
-
-		return true;
 	}
 
-	bool TestApp::FinishFrame()
+	void TestApp::FinishFrame()
 	{
 		mRenderer.PostRender();
-		return true;
 	}
 }

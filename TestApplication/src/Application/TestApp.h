@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include "App.h"
 #include "AssetManagement/AssetDatabase.h"
 #include "Systems/GameObject.h"
@@ -32,14 +31,14 @@ namespace Application
 		TestApp(float width, float height);
 		~TestApp() override;
 	protected:
-		bool LoadAssets() override;
-		bool InitializeGUI() override;
-		bool DeinitializeGUI() override;
-		bool UpdateGUI() override;
-		bool UpdateInput() override;
-		bool UpdateLogic() override;
-		bool UpdateScreen() override;
-		bool FinishFrame() override;
+		void LoadAssets() override;
+		void InitializeGUI() override;
+		void DeinitializeGUI() override;
+		void UpdateGUI() override;
+		void UpdateInput() override;
+		void UpdateLogic() override;
+		void UpdateScreen() override;
+		void FinishFrame() override;
 	private:
 		void ShowTransform(const char* title, const bool collapsed, glm::vec3* position = nullptr,
 			glm::vec3* rotation = nullptr, glm::vec3* scale = nullptr);
